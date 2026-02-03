@@ -13,21 +13,21 @@ const props = defineProps<{
 // @ts-ignore
 const t = (key: string) => (translations as any)[props.currentLang]?.[key] || key
 
-const pageStyle = computed(() => {
+const pageStyle = computed<Record<string, string | number>>(() => {
   const width = props.settings.paperSize === 'Letter' ? '216mm' : '210mm'
   const height = props.settings.paperSize === 'Letter' ? '279mm' : '297mm'
 
   return {
     '--line-spacing': props.settings.lineSpacing,
-    '--paragraph-spacing': props.settings.paragraphSpacing + 'px',
-    '--margin-top': props.settings.marginTop + 'px',
-    '--margin-bottom': props.settings.marginBottom + 'px',
-    '--margin-left': props.settings.marginLeft + 'px',
-    '--margin-right': props.settings.marginRight + 'px',
+    '--paragraph-spacing': `${props.settings.paragraphSpacing}px`,
+    '--margin-top': `${props.settings.marginTop}px`,
+    '--margin-bottom': `${props.settings.marginBottom}px`,
+    '--margin-left': `${props.settings.marginLeft}px`,
+    '--margin-right': `${props.settings.marginRight}px`,
     '--theme-color': props.settings.themeColor,
     '--page-background': props.settings.pageBackground || '#ffffff',
     fontFamily: props.settings.fontFamily,
-    fontSize: props.settings.fontSize + 'pt',
+    fontSize: `${props.settings.fontSize}pt`,
     minHeight: height,
     width
   }
@@ -44,7 +44,6 @@ const skillsEntries = computed(() => {
 
 <template>
   <div id="resume-preview" class="w-full flex justify-center">
-    <!-- wrapper estable -->
     <div class="resume-page-wrap">
       <div :id="contentId" class="resume-page" :style="pageStyle">
         <header class="mb-6 text-center border-b pb-4" :style="{ borderColor: props.settings.themeColor }">
@@ -53,11 +52,11 @@ const skillsEntries = computed(() => {
           </h1>
 
           <div class="flex justify-center flex-wrap gap-x-4 gap-y-1 text-gray-700 contact-info">
-            <span v-if="cvData.location" class="flex items-center gap-1"><MapPin size="12" /> {{ cvData.location }}</span>
-            <span v-if="cvData.phone" class="flex items-center gap-1"><Phone size="12" /> {{ cvData.phone }}</span>
-            <span v-if="cvData.email" class="flex items-center gap-1"><Mail size="12" /> {{ cvData.email }}</span>
-            <span v-if="cvData.linkedin" class="flex items-center gap-1"><Linkedin size="12" /> LinkedIn</span>
-            <span v-if="cvData.github" class="flex items-center gap-1"><Github size="12" /> GitHub</span>
+            <span v-if="cvData.location" class="flex items-center gap-1"><MapPin :size="12" /> {{ cvData.location }}</span>
+            <span v-if="cvData.phone" class="flex items-center gap-1"><Phone :size="12" /> {{ cvData.phone }}</span>
+            <span v-if="cvData.email" class="flex items-center gap-1"><Mail :size="12" /> {{ cvData.email }}</span>
+            <span v-if="cvData.linkedin" class="flex items-center gap-1"><Linkedin :size="12" /> LinkedIn</span>
+            <span v-if="cvData.github" class="flex items-center gap-1"><Github :size="12" /> GitHub</span>
           </div>
         </header>
 
@@ -128,10 +127,7 @@ const skillsEntries = computed(() => {
 </template>
 
 <style scoped>
-.resume-page-wrap {
-  /* evita que cambios del layout padre deformen el contenido */
-  width: fit-content;
-}
+.resume-page-wrap { width: fit-content; }
 
 .resume-page {
   background-color: var(--page-background, #ffffff);

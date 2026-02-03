@@ -48,7 +48,6 @@ const ensureSkillsObject = () => {
   const base: Record<string, string> = invalid ? {} : { ...s }
   if ('other' in base) delete (base as any).other
 
-  // fijas
   base.frontend ??= ''
   base.backend ??= ''
   base.db ??= ''
@@ -74,7 +73,6 @@ const extraSkillEntries = computed<SkillEntry[]>(() => {
 })
 
 const generateUniqueKey = (skills: Record<string, any>) => {
-  // nombre inicial amigable
   let base = props.currentLang === 'es' ? 'nueva_habilidad' : 'new_skill'
   base = base.toLowerCase().replace(/\s+/g, '_')
 
@@ -85,10 +83,6 @@ const generateUniqueKey = (skills: Record<string, any>) => {
   return `${base}_${i}`
 }
 
-/**
- * ESTE botón es el que querías:
- * "+ Agregar habilidades" agrega una nueva skill extra con nombre editable.
- */
 const handleAddSkillsButton = () => {
   ensureSkillsObject()
   if (!skillsReady.value) return
@@ -101,7 +95,6 @@ const handleAddSkillsButton = () => {
 
   cvDataLocal.value = { ...cv, skills }
 
-  // opcional: focus al input recién creado
   queueMicrotask(() => {
     const el = document.querySelector<HTMLInputElement>(`[data-skill-key="${newKey}"]`)
     el?.focus()
@@ -131,7 +124,6 @@ const renameExtraSkillKey = (oldKey: string, newKeyRaw: string) => {
   const newKey = newKeyRaw.trim().toLowerCase().replace(/\s+/g, '_')
   if (!newKey) return
 
-  // No permitir chocar con fijas o existentes
   if ((fixedSkillKeys as readonly string[]).includes(newKey)) {
     alert(props.currentLang === 'es' ? 'Ese nombre está reservado (campo fijo).' : 'That name is reserved (fixed field).')
     return
@@ -141,7 +133,6 @@ const renameExtraSkillKey = (oldKey: string, newKeyRaw: string) => {
     return
   }
 
-  // mover valor
   const value = skills[oldKey]
   delete skills[oldKey]
   skills[newKey] = value
@@ -221,7 +212,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         <div v-for="(job, index) in (cvDataLocal.experience || [])" :key="index" class="card-item">
           <div class="flex justify-between mb-2 gap-2">
             <input v-model="job.company" class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white placeholder-gray-400" :placeholder="t('companyPlaceholder')" />
-            <button @click="cvDataLocal.experience.splice(index, 1)" class="del-btn" type="button"><Trash2 size="14" /></button>
+            <button @click="cvDataLocal.experience.splice(index, 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
           </div>
 
           <div class="grid grid-cols-2 gap-2 mb-2">
@@ -247,7 +238,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         <div v-for="(proj, index) in (cvDataLocal.projects || [])" :key="index" class="card-item">
           <div class="flex justify-between mb-1 gap-2">
             <input v-model="proj.name" class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white" :placeholder="t('projectNamePlaceholder')" />
-            <button @click="cvDataLocal.projects.splice(index, 1)" class="del-btn" type="button"><Trash2 size="14" /></button>
+            <button @click="cvDataLocal.projects.splice(index, 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
           </div>
 
           <textarea v-model="proj.description" rows="2" class="input-sm w-full mb-2 bg-white dark:bg-gray-900" :placeholder="t('projectDescriptionPlaceholder')"></textarea>
@@ -268,7 +259,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
           <input v-model="edu.date" class="input-sm" :placeholder="t('educationDatePlaceholder')" />
           <input v-model="edu.location" class="input-sm col-span-2" :placeholder="t('educationLocationPlaceholder')" />
           <div class="col-span-2 flex justify-end">
-            <button @click="cvDataLocal.education.splice(index, 1)" class="del-btn" type="button"><Trash2 size="14" /></button>
+            <button @click="cvDataLocal.education.splice(index, 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
           </div>
         </div>
       </section>
@@ -284,7 +275,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
 
         <div v-for="(_, index) in (cvDataLocal.certifications || [])" :key="index" class="flex gap-2 items-center">
           <input v-model="cvDataLocal.certifications[index]" class="input-field flex-1" />
-          <button @click="cvDataLocal.certifications.splice(index, 1)" class="del-btn self-center" type="button"><Trash2 size="14" /></button>
+          <button @click="cvDataLocal.certifications.splice(index, 1)" class="del-btn self-center" type="button"><Trash2 :size="14" /></button>
         </div>
       </section>
 
@@ -298,7 +289,6 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         </div>
 
         <div v-if="skillsReady" class="space-y-3">
-          <!-- Fijas -->
           <div>
             <label class="label">{{ t('skillsFrontend') }}</label>
             <input v-model="cvDataLocal.skills.frontend" class="input-field" />
@@ -320,7 +310,6 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
             <input v-model="cvDataLocal.skills.languages" class="input-field" />
           </div>
 
-          <!-- Extras con nombre editable -->
           <div v-if="extraSkillEntries.length" class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
             <div class="text-[10px] uppercase font-bold text-gray-500">
               {{ props.currentLang === 'es' ? 'Habilidades personalizadas' : 'Custom skills' }}
@@ -336,7 +325,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
                   :placeholder="props.currentLang === 'es' ? 'Nombre (ej: APIs)' : 'Name (e.g. APIs)'"
                 />
                 <button class="del-btn" type="button" @click="deleteExtraSkill(entry.key)">
-                  <Trash2 size="14" />
+                  <Trash2 :size="14" />
                 </button>
               </div>
 

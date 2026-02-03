@@ -58,7 +58,8 @@ const updateSetting = (key: keyof typeof props.settings, value: any) => {
 
 const handleImportChange = (e: Event) => {
   const input = e.target as HTMLInputElement
-  if (input.files?.length) emit('importJSON', input.files[0])
+  const file = input.files?.[0]
+  if (file) emit('importJSON', file)
   input.value = ''
 }
 
@@ -71,12 +72,12 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
     <!-- ARCHIVO -->
     <div class="p-5 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500 mb-4">
-        <Download size="14" /> {{ t('fileSection') }}
+        <Download :size="14" /> {{ t('fileSection') }}
       </div>
 
       <div class="space-y-3">
         <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700">
-          <FilePenLine size="14" class="text-gray-500" />
+          <FilePenLine :size="14" class="text-gray-500" />
           <input
             v-model="localFileName"
             class="bg-transparent text-sm w-full outline-none text-gray-800 dark:text-white font-semibold"
@@ -85,12 +86,12 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-          <button @click="$emit('save')" class="btn-action"><Save size="14" /> {{ t('save') }}</button>
-          <button @click="$emit('printPDF')" class="btn-action"><Printer size="14" /> PDF</button>
-          <button @click="$emit('exportJSON')" class="btn-action"><FileJson size="14" /> JSON</button>
+          <button @click="$emit('save')" class="btn-action" type="button"><Save :size="14" /> {{ t('save') }}</button>
+          <button @click="$emit('printPDF')" class="btn-action" type="button"><Printer :size="14" /> PDF</button>
+          <button @click="$emit('exportJSON')" class="btn-action" type="button"><FileJson :size="14" /> JSON</button>
 
           <label class="btn-action cursor-pointer">
-            <Upload size="14" /> {{ t('import') }}
+            <Upload :size="14" /> {{ t('import') }}
             <input type="file" accept=".json,.pdf,.docx" class="hidden" @change="handleImportChange" />
           </label>
         </div>
@@ -100,18 +101,18 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
     <!-- DISEÑO -->
     <div class="p-5 space-y-6">
       <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
-        <Palette size="14" /> {{ props.currentLang === 'es' ? 'Diseño' : 'Design' }}
+        <Palette :size="14" /> {{ props.currentLang === 'es' ? 'Diseño' : 'Design' }}
       </div>
 
       <!-- Tamaño de página -->
       <div class="space-y-1">
         <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-          <FileText size="14" />
+          <FileText :size="14" />
           <span>{{ t('paperSize') }}</span>
         </div>
         <select
           :value="props.settings.paperSize"
-          @change="updateSetting('paperSize', ($event.target as HTMLSelectElement).value)"
+          @change="updateSetting('paperSize', (($event.target as HTMLSelectElement).value as PaperSize))"
           class="w-32 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-800 dark:text-gray-100"
         >
           <option value="A4">{{ t('paperA4') }}</option>
@@ -122,12 +123,14 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
       <!-- Colores -->
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-          <Palette size="14" />
+          <Palette :size="14" />
           <span>{{ props.currentLang === 'es' ? 'Colores' : 'Colors' }}</span>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[10px] text-gray-400 mr-1">{{ props.currentLang === 'es' ? 'Títulos' : 'Headings' }}</span>
+          <span class="text-[10px] text-gray-400 mr-1">
+            {{ props.currentLang === 'es' ? 'Títulos' : 'Headings' }}
+          </span>
           <button
             v-for="c in themeColors"
             :key="c"
@@ -135,6 +138,7 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
             :class="c === props.settings.themeColor ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-300'"
             :style="{ backgroundColor: c }"
             @click="updateSetting('themeColor', c)"
+            type="button"
           ></button>
           <input
             :value="props.settings.themeColor"
@@ -145,7 +149,9 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[10px] text-gray-400 mr-1">{{ props.currentLang === 'es' ? 'Fondo hoja' : 'Page background' }}</span>
+          <span class="text-[10px] text-gray-400 mr-1">
+            {{ props.currentLang === 'es' ? 'Fondo hoja' : 'Page background' }}
+          </span>
           <button
             v-for="c in bgColors"
             :key="c"
@@ -153,6 +159,7 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
             :class="c === props.settings.pageBackground ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-300'"
             :style="{ backgroundColor: c }"
             @click="updateSetting('pageBackground', c)"
+            type="button"
           ></button>
           <input
             :value="props.settings.pageBackground"
@@ -166,7 +173,7 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
       <!-- Tipografía -->
       <div class="space-y-1">
         <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-          <Type size="14" />
+          <Type :size="14" />
           <span>{{ t('fontFamily') }}</span>
         </div>
         <select
@@ -186,7 +193,7 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
       <div class="space-y-1">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-            <Type size="14" />
+            <Type :size="14" />
             <span>{{ t('fontSize') }}</span>
           </div>
           <span class="text-[10px] text-gray-400">{{ props.settings.fontSize }}pt</span>
@@ -206,7 +213,7 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
       <div class="space-y-1">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-            <FileText size="14" />
+            <FileText :size="14" />
             <span>{{ t('paragraphSpacing') }}</span>
           </div>
           <span class="text-[10px] text-gray-400">{{ props.settings.paragraphSpacing }}px</span>
@@ -226,7 +233,7 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
       <div class="space-y-1">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-            <Monitor size="14" />
+            <Monitor :size="14" />
             <span>{{ t('lineSpacing') }}</span>
           </div>
           <span class="text-[10px] text-gray-400">{{ props.settings.lineSpacing.toFixed(2) }}</span>

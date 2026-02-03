@@ -135,8 +135,9 @@ const handleDownload = async (cv: any) => {
         <button
           @click="triggerImport"
           class="flex items-center gap-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
+          type="button"
         >
-          <Upload size="18" />
+          <Upload :size="18" />
           <span>{{ t('import', currentLang) }}</span>
         </button>
 
@@ -194,7 +195,7 @@ const handleDownload = async (cv: any) => {
               {{ cv.fileName || cv.name || 'CV Sin Título' }}
             </h3>
             <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-              <FileText size="10" /> {{ t('edited', currentLang) }}
+              <FileText :size="10" /> {{ t('edited', currentLang) }}
             </p>
           </div>
 
@@ -203,24 +204,27 @@ const handleDownload = async (cv: any) => {
               @click.stop="handleDownload(cv)"
               class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition"
               :title="currentLang === 'es' ? 'Descargar (PDF o JSON)' : 'Download (PDF or JSON)'"
+              type="button"
             >
-              <Download size="16" />
+              <Download :size="16" />
             </button>
 
             <button
               @click.stop="emit('duplicateCv', index)"
               class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded transition"
-              title="Duplicar"
+              :title="currentLang === 'es' ? 'Duplicar' : 'Duplicate'"
+              type="button"
             >
-              <Copy size="16" />
+              <Copy :size="16" />
             </button>
 
             <button
               @click.stop="emit('deleteCv', index)"
               class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition"
-              title="Eliminar"
+              :title="currentLang === 'es' ? 'Eliminar' : 'Delete'"
+              type="button"
             >
-              <Trash2 size="16" />
+              <Trash2 :size="16" />
             </button>
           </div>
         </div>

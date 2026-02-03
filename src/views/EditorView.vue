@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import EditFile from '../components/EditFile.vue'
 
 import * as mammoth from 'mammoth'
 import * as pdfjsLib from 'pdfjs-dist'
-
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 // @ts-ignore
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`
@@ -74,7 +71,7 @@ watch(
 const handleSave = () => emit('save', cvData.value)
 const handleBack = () => emit('back')
 
-/** ---------- Responsive tabs (mobile/tablet) ---------- */
+/** ---------- Responsive tabs ---------- */
 type MobileTab = 'editor' | 'preview' | 'design'
 const mobileTab = ref<MobileTab>('preview')
 
@@ -94,7 +91,7 @@ const handleExportJSON = () => {
   URL.revokeObjectURL(url)
 }
 
-/** ---------- Export helpers ---------- */
+/** ---------- PDF PERFECTO (sin popup, usando print del mismo documento) ---------- */
 const waitTwoFrames = async () => {
   await new Promise<void>((r) => requestAnimationFrame(() => r()))
   await new Promise<void>((r) => requestAnimationFrame(() => r()))
@@ -108,27 +105,41 @@ const waitFonts = async () => {
   }
 }
 
-const buildSandbox = () => {
-  const sandbox = document.createElement('div')
-  sandbox.id = 'pdf-export-sandbox'
-  sandbox.style.position = 'fixed'
-  sandbox.style.left = '-99999px'
-  sandbox.style.top = '0'
-  sandbox.style.background = '#ffffff'
-  sandbox.style.padding = '0'
-  sandbox.style.margin = '0'
-  sandbox.style.zIndex = '-1'
-  sandbox.style.pointerEvents = 'none'
-  return sandbox
+const ensurePrintStyles = () => {
+  const id = 'pf-print-style'
+  if (document.getElementById(id)) return
+
+  const style = document.createElement('style')
+  style.id = id
+  style.textContent = `
+@media print {
+  @page { size: A4; margin: 0; } /* se ajusta dinámico en runtime con data-attr */
+  html, body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* ocultar toda la app */
+  body > *:not(#pf-print-root) { display: none !important; }
+
+  /* mostrar solo el print root */
+  #pf-print-root { display: block !important; }
+
+  /* hoja */
+  #pf-print-root .resume-page {
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    transform: none !important;
+  }
+
+  /* evitar cortes feos en bloques */
+  header, section { break-inside: avoid; page-break-inside: avoid; }
+  ul, li { break-inside: avoid; page-break-inside: avoid; }
+}
+`
+  document.head.appendChild(style)
 }
 
-/**
- * Export PDF SIN blanco y multipágina alineada:
- * - Captura desde un clon con tamaño fijo (px)
- * - NO usa foreignObjectRendering (evita canvas vacío)
- * - Divide por slices (cada página desde 0,0)
- */
 const handleExportPDF = async () => {
+  await nextTick()
+
   const pageEl =
     document.querySelector<HTMLElement>('#resume-preview-content.resume-page') ??
     document.querySelector<HTMLElement>('#resume-preview-content .resume-page') ??
@@ -139,102 +150,89 @@ const handleExportPDF = async () => {
     return
   }
 
-  const isLetter = settings.value.paperSize === 'Letter'
-  const pdfFormat = isLetter ? 'letter' : 'a4'
+  ensurePrintStyles()
 
-  // Tamaño fijo en px (independiente del viewport)
-  const targetWidthPx = isLetter ? 850 : 794
-
-  // Clonar hoja
-  const clone = pageEl.cloneNode(true) as HTMLElement
-  clone.style.transform = 'none'
-  clone.style.boxShadow = 'none'
-  clone.style.margin = '0'
-  clone.style.background = '#ffffff'
-  clone.style.overflow = 'visible'
-  clone.style.width = `${targetWidthPx}px`
-  clone.style.maxWidth = `${targetWidthPx}px`
-  clone.style.paddingBottom = '60px' // buffer contra cortes feos
-
-  const sandbox = buildSandbox()
-  sandbox.appendChild(clone)
-  document.body.appendChild(sandbox)
-
-  try {
-    await waitFonts()
-    await waitTwoFrames()
-
-    // Medidas reales ya renderizadas
-    const exportWidth = clone.scrollWidth
-    const exportHeight = clone.scrollHeight
-
-    const canvas = await html2canvas(clone, {
-      backgroundColor: '#ffffff',
-      useCORS: true,
-      scale: 2,
-      scrollX: 0,
-      scrollY: 0,
-      width: exportWidth,
-      height: exportHeight,
-      windowWidth: exportWidth,
-      windowHeight: exportHeight
-    })
-
-    // Si aún así queda blanco, lo detectamos
-    const ctxTest = canvas.getContext('2d')
-    const pixel = ctxTest?.getImageData(0, 0, 1, 1).data
-    const isBlank = pixel ? pixel[0] === 255 && pixel[1] === 255 && pixel[2] === 255 && pixel[3] === 255 : false
-    if (isBlank && exportHeight > 50) {
-      alert(
-        props.currentLang === 'es'
-          ? 'La captura salió en blanco. Revisa si hay extensiones (dark reader) o estilos globales con filter/transform.'
-          : 'Capture is blank. Check extensions (dark reader) or global CSS filter/transform.'
-      )
-      return
-    }
-
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: pdfFormat
-    })
-
-    const pdfW = pdf.internal.pageSize.getWidth()
-    const pdfH = pdf.internal.pageSize.getHeight()
-
-    // Altura en px equivalente a 1 página, basado en ratio PDF
-    const pageHeightPx = Math.floor((canvas.width * pdfH) / pdfW)
-    const pageCount = Math.ceil(canvas.height / pageHeightPx)
-
-    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-      const sliceCanvas = document.createElement('canvas')
-      const sliceCtx = sliceCanvas.getContext('2d')
-
-      const sliceY = pageIndex * pageHeightPx
-      const sliceH = Math.min(pageHeightPx, canvas.height - sliceY)
-
-      sliceCanvas.width = canvas.width
-      sliceCanvas.height = sliceH
-
-      if (!sliceCtx) continue
-      sliceCtx.fillStyle = '#ffffff'
-      sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height)
-
-      sliceCtx.drawImage(canvas, 0, sliceY, canvas.width, sliceH, 0, 0, canvas.width, sliceH)
-
-      const imgData = sliceCanvas.toDataURL('image/jpeg', 0.98)
-
-      if (pageIndex > 0) pdf.addPage()
-
-      const imgWmm = pdfW
-      const imgHmm = (sliceH * imgWmm) / canvas.width
-      pdf.addImage(imgData, 'JPEG', 0, 0, imgWmm, imgHmm, undefined, 'FAST')
-    }
-
-    pdf.save(`${(cvData.value.fileName || 'CV').replace(/\s+/g, '_')}.pdf`)
-  } finally {
-    document.body.removeChild(sandbox)
+  // root para impresión dentro del mismo documento (sin popup)
+  let root = document.getElementById('pf-print-root') as HTMLDivElement | null
+  if (!root) {
+    root = document.createElement('div')
+    root.id = 'pf-print-root'
+    root.style.display = 'none'
+    document.body.appendChild(root)
   }
+
+  // limpiar e insertar clon
+  root.innerHTML = ''
+  const clone = pageEl.cloneNode(true) as HTMLElement
+  clone.removeAttribute('id') // evitar duplicados
+  clone.style.boxShadow = 'none'
+  clone.style.transform = 'none'
+  root.appendChild(clone)
+
+  // Ajustar tamaño de página según settings
+  const isLetter = settings.value.paperSize === 'Letter'
+  const pageSize = isLetter ? 'Letter' : 'A4'
+  const pageWidth = isLetter ? '216mm' : '210mm'
+  const pageHeight = isLetter ? '279mm' : '297mm'
+
+  // Inyectar estilo runtime para asegurar 1:1
+  const runtimeId = 'pf-print-runtime-style'
+  const existing = document.getElementById(runtimeId)
+  if (existing) existing.remove()
+
+  const runtime = document.createElement('style')
+  runtime.id = runtimeId
+  runtime.textContent = `
+@media print {
+  @page { size: ${pageSize}; margin: 0; }
+  #pf-print-root .resume-page {
+    width: ${pageWidth} !important;
+    min-height: ${pageHeight} !important;
+    background: ${settings.value.pageBackground || '#ffffff'} !important;
+
+    font-family: ${settings.value.fontFamily} !important;
+    font-size: ${settings.value.fontSize}pt !important;
+    line-height: ${settings.value.lineSpacing} !important;
+
+    padding-top: ${settings.value.marginTop}px !important;
+    padding-right: ${settings.value.marginRight}px !important;
+    padding-bottom: ${settings.value.marginBottom}px !important;
+    padding-left: ${settings.value.marginLeft}px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /* Colores de títulos */
+  #pf-print-root .section-title {
+    color: ${settings.value.themeColor} !important;
+    border-bottom-color: ${settings.value.themeColor} !important;
+  }
+  #pf-print-root header {
+    border-bottom-color: ${settings.value.themeColor} !important;
+  }
+}
+`
+  document.head.appendChild(runtime)
+
+  await waitFonts()
+  await waitTwoFrames()
+
+  // mostrar root solo para imprimir
+  root.style.display = 'block'
+
+  const cleanup = () => {
+    root!.style.display = 'none'
+    // no borramos el root, solo lo ocultamos para siguientes exports
+  }
+
+  // algunos navegadores soportan afterprint
+  window.addEventListener('afterprint', cleanup, { once: true })
+
+  // disparar impresión (user: Guardar como PDF)
+  window.print()
+
+  // fallback: si afterprint no corre, ocultar luego de un rato
+  setTimeout(() => cleanup(), 1500)
 }
 
 /** ---------- Import ---------- */

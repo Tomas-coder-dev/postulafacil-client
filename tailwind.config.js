@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class', // <--- AGREGA ESTA LÍNEA
+  darkMode: 'class', // <--- ¡ESTA LÍNEA ES OBLIGATORIA!
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",

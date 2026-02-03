@@ -1,11 +1,18 @@
 <script setup lang="ts">
+// Recibimos el estado desde el padre
 defineProps<{ isDark: boolean }>()
 const emit = defineEmits(['toggle'])
 </script>
 
 <template>
-  <label class="switch">
-    <input id="input" type="checkbox" :checked="isDark" @change="emit('toggle')" />
+  <label class="switch" @click.stop>
+    <input 
+      id="theme-checkbox" 
+      type="checkbox" 
+      :checked="isDark" 
+      @change="emit('toggle')" 
+    />
+    
     <div class="slider round">
       <div class="sun-moon">
         <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg>
@@ -32,18 +39,25 @@ const emit = defineEmits(['toggle'])
 </template>
 
 <style scoped>
-/* TU CSS ORIGINAL COPIADO EXACTAMENTE */
-.switch { position: relative; display: inline-block; width: 60px; height: 34px; }
-.switch #input { opacity: 0; width: 0; height: 0; }
+.switch { position: relative; display: inline-block; width: 60px; height: 34px; cursor: pointer; }
+
+/* Ocultamos el input pero dejamos que sea interactivo */
+.switch #theme-checkbox { opacity: 0; width: 0; height: 0; position: absolute; }
+
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2196f3; transition: 0.4s; z-index: 0; overflow: hidden; }
-.sun-moon { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: yellow; transition: 0.4s; }
-#input:checked + .slider { background-color: black; }
-#input:focus + .slider { box-shadow: 0 0 1px #2196f3; }
-#input:checked + .slider .sun-moon { transform: translateX(26px); background-color: white; animation: rotate-center 0.6s ease-in-out both; }
+.sun-moon { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: yellow; transition: 0.4s; z-index: 10; }
+
+/* ESTADOS ACTIVOS (Usando el nuevo ID) */
+#theme-checkbox:checked + .slider { background-color: black; }
+#theme-checkbox:checked + .slider .sun-moon { transform: translateX(26px); background-color: white; animation: rotate-center 0.6s ease-in-out both; }
+
 .moon-dot { opacity: 0; transition: 0.4s; fill: gray; }
-#input:checked + .slider .sun-moon .moon-dot { opacity: 1; }
+#theme-checkbox:checked + .slider .sun-moon .moon-dot { opacity: 1; }
+
 .slider.round { border-radius: 34px; }
 .slider.round .sun-moon { border-radius: 50%; }
+
+/* Decoraciones */
 #moon-dot-1 { left: 10px; top: 3px; position: absolute; width: 6px; height: 6px; z-index: 4; }
 #moon-dot-2 { left: 2px; top: 10px; position: absolute; width: 10px; height: 10px; z-index: 4; }
 #moon-dot-3 { left: 16px; top: 18px; position: absolute; width: 3px; height: 3px; z-index: 4; }
@@ -61,7 +75,7 @@ const emit = defineEmits(['toggle'])
 @keyframes cloud-move { 0% { transform: translateX(0px); } 40% { transform: translateX(4px); } 80% { transform: translateX(-4px); } 100% { transform: translateX(0px); } }
 .stars { transform: translateY(-32px); opacity: 0; transition: 0.4s; }
 .star { fill: white; position: absolute; transition: 0.4s; animation: star-twinkle 2s infinite; }
-#input:checked + .slider .stars { transform: translateY(0); opacity: 1; }
+#theme-checkbox:checked + .slider .stars { transform: translateY(0); opacity: 1; }
 #star-1 { width: 20px; top: 2px; left: 3px; animation-delay: 0.3s; }
 #star-2 { width: 6px; top: 16px; left: 3px; }
 #star-3 { width: 12px; top: 20px; left: 10px; animation-delay: 0.6s; }

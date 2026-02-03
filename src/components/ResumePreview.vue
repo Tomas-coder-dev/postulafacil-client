@@ -5,98 +5,67 @@ import { translations } from '../utils/translations'
 
 const props = defineProps<{
   cvData: any
-  settings: {
-    paperSize?: 'A4' | 'Letter'
-    lineSpacing: number
-    fontFamily: string
-    fontSize: number
-    paragraphSpacing: number
-    marginTop: number
-    marginBottom: number
-    marginLeft: number
-    marginRight: number
-    themeColor: string
-    pageBackground?: string
-  }
+  settings: any
   currentLang: 'es' | 'en'
+  exportMode?: boolean
 }>()
 
 // @ts-ignore
-const t = (key: string) => translations[props.currentLang]?.[key] || key
+const t = (key: string) => (translations as any)[props.currentLang]?.[key] || key
 
 const pageStyle = computed(() => {
   const width = props.settings.paperSize === 'Letter' ? '216mm' : '210mm'
   const height = props.settings.paperSize === 'Letter' ? '279mm' : '297mm'
 
   return {
-    '--line-spacing': props.settings.lineSpacing || 1.4,
+    '--line-spacing': props.settings.lineSpacing,
     '--paragraph-spacing': props.settings.paragraphSpacing + 'px',
     '--margin-top': props.settings.marginTop + 'px',
     '--margin-bottom': props.settings.marginBottom + 'px',
     '--margin-left': props.settings.marginLeft + 'px',
     '--margin-right': props.settings.marginRight + 'px',
-    '--theme-color': props.settings.themeColor || '#000000',
+    '--theme-color': props.settings.themeColor,
     '--page-background': props.settings.pageBackground || '#ffffff',
-    'font-family': props.settings.fontFamily || 'Times New Roman, serif',
+    'font-family': props.settings.fontFamily,
     'font-size': props.settings.fontSize + 'pt',
-    width,
-    'min-height': height
+    'min-height': height,
+    width
   }
+})
+
+const contentId = computed(() => (props.exportMode ? 'resume-preview-content' : undefined))
+
+const skillsEntries = computed(() => {
+  const s = props.cvData?.skills
+  if (!s || typeof s !== 'object' || Array.isArray(s)) return []
+  return Object.entries(s).filter(([k, v]) => k !== 'other' && !!v)
 })
 </script>
 
 <template>
   <div id="resume-preview">
-    <div class="resume-page" :style="pageStyle">
-      <!-- CABECERA -->
-      <header class="resume-header mb-5">
-        <h1 class="uppercase tracking-wider">
+    <div :id="contentId" class="resume-page" :style="pageStyle">
+      <header class="mb-6 text-center border-b pb-4" :style="{ borderColor: props.settings.themeColor }">
+        <h1 class="uppercase tracking-wider font-bold mb-2 leading-none text-black">
           {{ cvData.name }}
         </h1>
 
-        <div class="contact-info">
-          <span v-if="cvData.location" class="info-item">
-            <MapPin size="12" /> {{ cvData.location }}
-          </span>
-          <span v-if="cvData.phone" class="info-item">
-            <Phone size="12" /> {{ cvData.phone }}
-          </span>
-          <span v-if="cvData.email" class="info-item">
-            <Mail size="12" /> {{ cvData.email }}
-          </span>
-          <span v-if="cvData.linkedin" class="info-item">
-            <Linkedin size="12" />
-            <a :href="cvData.linkedin" target="_blank" rel="noopener noreferrer">
-              LinkedIn
-            </a>
-          </span>
-          <span v-if="cvData.github" class="info-item">
-            <Github size="12" />
-            <a :href="cvData.github" target="_blank" rel="noopener noreferrer">
-              GitHub
-            </a>
-          </span>
+        <div class="flex justify-center flex-wrap gap-x-4 gap-y-1 text-gray-700 contact-info">
+          <span v-if="cvData.location" class="flex items-center gap-1"><MapPin size="12" /> {{ cvData.location }}</span>
+          <span v-if="cvData.phone" class="flex items-center gap-1"><Phone size="12" /> {{ cvData.phone }}</span>
+          <span v-if="cvData.email" class="flex items-center gap-1"><Mail size="12" /> {{ cvData.email }}</span>
+          <span v-if="cvData.linkedin" class="flex items-center gap-1"><Linkedin size="12" /> LinkedIn</span>
+          <span v-if="cvData.github" class="flex items-center gap-1"><Github size="12" /> GitHub</span>
         </div>
       </header>
 
-      <!-- RESUMEN -->
-      <section v-if="cvData.summary" class="mb-4 section-block">
-        <p class="text-justify leading-relaxed">
-          {{ cvData.summary }}
-        </p>
+      <section v-if="cvData.summary" class="section-block">
+        <p class="text-justify leading-relaxed whitespace-pre-line">{{ cvData.summary }}</p>
       </section>
 
-      <!-- EXPERIENCIA -->
-      <section
-        v-if="cvData.experience && cvData.experience.length"
-        class="mb-4 section-block"
-      >
-        <h2>{{ t('cv_experienceTitle') }}</h2>
-        <div
-          v-for="(job, index) in cvData.experience"
-          :key="index"
-          class="mb-4"
-        >
+      <section v-if="cvData.experience?.length" class="section-block">
+        <h2 class="section-title">{{ t('cv_experienceTitle') || 'Experiencia' }}</h2>
+        <div v-for="(job, i) in cvData.experience" :key="i" class="mb-4">
           <div class="flex justify-between font-bold">
             <span>{{ job.company }}</span>
             <span>{{ job.location }}</span>
@@ -106,50 +75,28 @@ const pageStyle = computed(() => {
             <span>{{ job.date }}</span>
           </div>
 
-          <ul
-            v-if="Array.isArray(job.description)"
-            class="list-disc ml-5 mt-1"
-          >
-            <li
-              v-for="(desc, i) in job.description"
-              :key="i"
-              class="text-justify"
-            >
-              {{ desc }}
-            </li>
+          <ul v-if="Array.isArray(job.description)" class="list-disc ml-5">
+            <li v-for="(desc, j) in job.description" :key="j" class="text-justify">{{ desc }}</li>
           </ul>
-          <p v-else class="text-justify">
-            {{ job.description }}
+          <p v-else class="text-justify whitespace-pre-line">{{ job.description }}</p>
+        </div>
+      </section>
+
+      <section v-if="cvData.projects?.length" class="section-block">
+        <h2 class="section-title">{{ t('cv_projectsTitle') || 'Proyectos Relevantes' }}</h2>
+
+        <div v-for="(proj, i) in cvData.projects" :key="i" class="mb-4">
+          <div class="font-bold">{{ proj.name }}</div>
+          <p class="text-justify">{{ proj.description }}</p>
+          <p v-if="proj.tech" class="mt-1">
+            <strong>{{ t('cv_technologies') || 'Tecnologías' }}:</strong> {{ proj.tech }}
           </p>
         </div>
       </section>
 
-      <!-- PROYECTOS -->
-      <section
-        v-if="cvData.projects && cvData.projects.length"
-        class="mb-4 section-block"
-      >
-        <h2>{{ t('cv_projectsTitle') }}</h2>
-        <div v-for="(proj, index) in cvData.projects" :key="index" class="mb-3">
-          <div class="font-bold">
-            {{ proj.name }}
-          </div>
-          <p class="text-justify text-sm mb-1">
-            {{ proj.description }}
-          </p>
-          <p class="italic text-sm text-gray-700">
-            <strong>{{ t('cv_technologies') }}:</strong> {{ proj.tech }}
-          </p>
-        </div>
-      </section>
-
-      <!-- EDUCACIÓN -->
-      <section
-        v-if="cvData.education && cvData.education.length"
-        class="mb-4 section-block"
-      >
-        <h2>{{ t('cv_educationTitle') }}</h2>
-        <div v-for="(edu, index) in cvData.education" :key="index" class="mb-2">
+      <section v-if="cvData.education?.length" class="section-block">
+        <h2 class="section-title">{{ t('cv_educationTitle') || 'Educación' }}</h2>
+        <div v-for="(edu, i) in cvData.education" :key="i" class="mb-2">
           <div class="flex justify-between font-bold">
             <span>{{ edu.school }}</span>
             <span>{{ edu.location }}</span>
@@ -161,52 +108,17 @@ const pageStyle = computed(() => {
         </div>
       </section>
 
-      <!-- CERTIFICACIONES -->
-      <section
-        v-if="cvData.certifications && cvData.certifications.length"
-        class="mb-4 section-block"
-      >
-        <h2>{{ t('cv_certificationsTitle') }}</h2>
+      <section v-if="cvData.certifications?.length" class="section-block">
+        <h2 class="section-title">{{ t('cv_certificationsTitle') || 'Certificaciones y actividades' }}</h2>
         <ul class="list-disc ml-5">
-          <li v-for="(cert, index) in cvData.certifications" :key="index">
-            {{ cert }}
-          </li>
+          <li v-for="(cert, i) in cvData.certifications" :key="i">{{ cert }}</li>
         </ul>
       </section>
 
-      <!-- HABILIDADES -->
-      <section v-if="cvData.skills" class="mb-4 section-block">
-        <h2>{{ t('cv_skillsTitle') }}</h2>
-
-        <div v-if="typeof cvData.skills === 'object'" class="space-y-1">
-          <p v-if="cvData.skills.frontend" class="mb-1">
-            <strong>{{ t('skillsFrontend') }}:</strong>
-            {{ cvData.skills.frontend }}
-          </p>
-          <p v-if="cvData.skills.backend" class="mb-1">
-            <strong>{{ t('skillsBackend') }}:</strong>
-            {{ cvData.skills.backend }}
-          </p>
-          <p v-if="cvData.skills.db" class="mb-1">
-            <strong>{{ t('skillsDB') }}:</strong>
-            {{ cvData.skills.db }}
-          </p>
-          <p v-if="cvData.skills.tools" class="mb-1">
-            <strong>{{ t('skillsTools') }}:</strong>
-            {{ cvData.skills.tools }}
-          </p>
-          <p v-if="cvData.skills.languages" class="mb-1">
-            <strong>{{ t('skillsLanguages') }}:</strong>
-            {{ cvData.skills.languages }}
-          </p>
-          <p v-if="cvData.skills.other" class="mb-1">
-            <strong>{{ t('skillsOther') }}:</strong>
-            {{ cvData.skills.other }}
-          </p>
-        </div>
-
-        <p v-else class="text-justify">
-          {{ cvData.skills }}
+      <section v-if="skillsEntries.length" class="section-block">
+        <h2 class="section-title">{{ t('cv_skillsTitle') || 'Skills adicionales' }}</h2>
+        <p v-for="([key, val], idx) in skillsEntries" :key="idx" class="mb-1">
+          <strong class="capitalize">{{ key }}:</strong> {{ val }}
         </p>
       </section>
     </div>
@@ -214,115 +126,34 @@ const pageStyle = computed(() => {
 </template>
 
 <style scoped>
-#resume-preview {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-}
+#resume-preview { display: flex; justify-content: center; width: 100%; }
 
-/* La hoja A4 se configura con variables CSS provenientes de settings */
 .resume-page {
   background-color: var(--page-background, #ffffff);
-  color: black;
-  padding-top: var(--margin-top, 40px);
-  padding-bottom: var(--margin-bottom, 40px);
-  padding-left: var(--margin-left, 50px);
-  padding-right: var(--margin-right, 50px);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-  line-height: var(--line-spacing, 1.4);
   margin: 0 auto;
+  padding-top: var(--margin-top);
+  padding-right: var(--margin-right);
+  padding-bottom: var(--margin-bottom);
+  padding-left: var(--margin-left);
+  color: black;
+  box-shadow: 0 0 15px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+  line-height: var(--line-spacing, 1.4);
 }
 
-/* Nombre */
-h1 {
-  font-size: 24pt;
-  font-weight: bold;
-  text-align: center;
-  text-transform: uppercase;
-  margin-bottom: 5px;
-  line-height: 1.2;
-}
+h1 { font-size: 24pt; }
 
-/* Títulos de secciones: usan themeColor */
-h2 {
-  font-size: 14pt;
+.section-title {
+  font-size: 1.15em;
   font-weight: bold;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--theme-color, #000000);
-  color: var(--theme-color, #000000);
-  margin-top: 15pt;
-  margin-bottom: 6pt;
+  color: var(--theme-color);
+  border-bottom: 1.5px solid var(--theme-color);
+  margin-bottom: 8px;
   padding-bottom: 2px;
 }
 
-/* Bloques de sección: separación controlada por settings */
-.section-block {
-  margin-bottom: var(--paragraph-spacing, 8px);
-}
+.section-block { margin-bottom: var(--paragraph-spacing); }
 
-/* Texto general */
-.resume-page p,
-.resume-page li,
-.resume-page span {
-  font-size: 11pt;
-}
-
-/* Contacto */
-.contact-info {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.95em;
-  margin-top: 5px;
-}
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.info-item:not(:last-child)::after {
-  content: '|';
-  margin-left: 8px;
-  color: #999;
-}
-
-/* Listas */
-.resume-page ul {
-  padding-left: 1.2rem;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
-/* Links */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* IMPRESIÓN: hoja blanca sin fondo gris ni sombras */
-@media print {
-  body {
-    margin: 0;
-    padding: 0;
-    background: white !important;
-  }
-  #app {
-    margin: 0;
-    padding: 0;
-    background: white !important;
-  }
-  #resume-preview {
-    background: white !important;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  .resume-page {
-    background-color: #ffffff !important;
-    box-shadow: none !important;
-    margin: 0 auto;
-    page-break-after: always;
-  }
-}
+@media print { .resume-page { box-shadow: none !important; } }
 </style>

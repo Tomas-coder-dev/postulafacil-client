@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { Copy, Trash2, FileText, Upload } from 'lucide-vue-next'
+import { Copy, Trash2, FileText, Upload, Download } from 'lucide-vue-next'
+import ResumePreview from './ResumePreview.vue'
 import { translations } from '../utils/translations'
+
+// @ts-ignore
+import html2pdf from 'html2pdf.js'
 
 const props = defineProps<{
   cvList: any[]
@@ -15,262 +19,210 @@ const emit = defineEmits<{
   (e: 'importCv', data: any): void
 }>()
 
-// Helper traducción
+const thumbnailSettings = {
+  paperSize: 'A4',
+  lineSpacing: 1.2,
+  fontFamily: 'Times New Roman, serif',
+  fontSize: 10,
+  paragraphSpacing: 5,
+  marginTop: 30,
+  marginBottom: 30,
+  marginLeft: 30,
+  marginRight: 30,
+  themeColor: '#000000',
+  pageBackground: '#ffffff'
+}
+
 // @ts-ignore
 const t = (key: string, lang: 'es' | 'en') => translations[lang]?.[key] || key
 
-// Import JSON
 const triggerImport = () => {
-  document.getElementById('file-upload')?.click()
+  document.getElementById('dashboard-file-upload')?.click()
 }
 
 const handleFileUpload = (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
 
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    try {
-      const json = JSON.parse(e.target?.result as string)
-      emit('importCv', json)
-    } catch {
-      alert(
-        props.currentLang === 'es'
-          ? 'Error: El archivo no es un JSON válido.'
-          : 'Error: File is not valid JSON.'
-      )
+  if (file.type === 'application/json' || file.name.toLowerCase().endsWith('.json')) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target?.result as string)
+        emit('importCv', json)
+      } catch {
+        alert(props.currentLang === 'es' ? 'JSON inválido.' : 'Invalid JSON.')
+      }
     }
+    reader.readAsText(file)
+  } else {
+    alert(
+      props.currentLang === 'es'
+        ? 'En el Dashboard solo se importa JSON completo. Para PDF/DOCX usa Import dentro del editor.'
+        : 'Dashboard imports full JSON only. For PDF/DOCX use Import inside the editor.'
+    )
   }
-  reader.readAsText(file)
+
+  ;(event.target as HTMLInputElement).value = ''
 }
 
-// Helpers para texto corto
-const firstItems = (arr: any[] | undefined, limit: number) =>
-  Array.isArray(arr) ? arr.slice(0, limit) : []
+const exportCvJson = (cv: any) => {
+  const dataStr = JSON.stringify(cv, null, 2)
+  const blob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
 
-const shortText = (text: string | undefined, max = 220) => {
-  if (!text) return ''
-  if (text.length <= max) return text
-  return text.slice(0, max) + '…'
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${(cv.fileName || 'CV_Export').replace(/\s+/g, '_')}.json`
+  a.click()
+
+  URL.revokeObjectURL(url)
+}
+
+const exportCvPdf = async (cv: any) => {
+  const temp = document.createElement('div')
+  temp.style.background = '#ffffff'
+  temp.style.padding = '0'
+  temp.style.margin = '0'
+
+  temp.innerHTML = `
+    <div style="width:210mm; min-height:297mm; background:#fff; padding:20mm; font-family: Times New Roman, serif;">
+      <h1 style="text-align:center; font-size:24pt; margin:0;">${cv.name || ''}</h1>
+      <p style="text-align:center; margin:6px 0 16px 0;">
+        ${(cv.email || '')}${cv.phone ? ' | ' + cv.phone : ''}
+      </p>
+      <p style="white-space:pre-line;">${cv.summary || ''}</p>
+    </div>
+  `
+
+  const opt = {
+    margin: 0,
+    filename: `${(cv.fileName || 'CV').replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  }
+
+  // @ts-ignore
+  await html2pdf().set(opt).from(temp).save()
+}
+
+const handleDownload = async (cv: any) => {
+  const isPdf = confirm(
+    props.currentLang === 'es'
+      ? '¿Descargar PDF?\n(Aceptar = PDF | Cancelar = JSON)'
+      : 'Download PDF?\n(OK = PDF | Cancel = JSON)'
+  )
+
+  if (isPdf) await exportCvPdf(cv)
+  else exportCvJson(cv)
 }
 </script>
 
 <template>
-  <div
-    class="px-4 sm:px-6 lg:px-10 xl:px-12 py-6 lg:py-10 max-w-7xl mx-auto min-h-[calc(100vh-64px)] font-sans"
-  >
-    <!-- HEADER -->
-    <div
-      class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6 mb-8 md:mb-10"
-    >
-      <div class="flex-1">
-        <h1
-          class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-1"
-        >
+  <div class="px-6 py-8 max-w-7xl mx-auto min-h-[calc(100vh-64px)] font-sans bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-1">
           {{ t('dashboardTitle', currentLang) }}
         </h1>
-        <p class="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+        <p class="text-gray-500 dark:text-gray-400">
           {{ t('dashboardSubtitle', currentLang) }}
         </p>
       </div>
 
-      <div class="flex items-center gap-3 self-stretch md:self-auto">
+      <div class="flex items-center gap-3">
         <button
           @click="triggerImport"
-          class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-gray-800 dark:bg-gray-700 text-white px-4 py-2 rounded hover:scale-105 transition shadow-lg border border-gray-600 text-sm"
+          class="flex items-center gap-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
         >
-          <Upload size="16" />
+          <Upload size="18" />
           <span>{{ t('import', currentLang) }}</span>
         </button>
+
         <input
-          id="file-upload"
+          id="dashboard-file-upload"
           type="file"
-          accept=".json"
+          accept=".json,application/json"
           class="hidden"
           @change="handleFileUpload"
         />
       </div>
     </div>
 
-    <!-- GRID DE CVS -->
-    <div
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8"
-    >
-      <!-- CARD NUEVO CV -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <div
         @click="emit('createNew')"
-        class="group cursor-pointer bg-gray-100 dark:bg-gray-800/40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center h-[340px] sm:h-[360px] lg:h-[380px] hover:border-postula-blue hover:bg-blue-50 dark:hover:bg-gray-800 transition duration-300"
+        class="group cursor-pointer min-h-[420px] bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800/80 transition duration-300"
       >
-        <div
-          class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-4xl text-gray-400 group-hover:text-postula-blue group-hover:scale-110 transition shadow-inner"
-        >
+        <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400 flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition shadow-sm">
           +
         </div>
-        <span
-          class="mt-4 font-bold text-gray-500 dark:text-gray-400 group-hover:text-postula-blue text-sm sm:text-base text-center px-4"
-        >
+        <span class="font-bold text-gray-600 dark:text-gray-300 group-hover:text-blue-600">
           {{ t('createNew', currentLang) }}
         </span>
       </div>
 
-      <!-- CARDS DE CVS EXISTENTES -->
       <div
         v-for="(cv, index) in cvList"
         :key="index"
-        class="relative group bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 h-[340px] sm:h-[360px] lg:h-[380px] flex flex-col transition-all duration-300 overflow-hidden"
+        class="group relative bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 flex flex-col min-h-[420px]"
       >
-        <!-- PREVIEW MINIATURA -->
         <div
-          class="flex-1 bg-gray-200 dark:bg-gray-900 relative overflow-hidden cursor-pointer"
+          class="relative flex-1 overflow-hidden bg-gray-200 dark:bg-gray-800 cursor-pointer"
           @click="emit('editCv', index)"
         >
-          <!-- Mini-hoja que refleja mejor el contenido -->
-          <div
-            class="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 origin-top bg-white text-black shadow-xl pointer-events-none select-none rounded-sm w-[190px] h-[270px] lg:w-[210mm] lg:h-[297mm] scale-[0.8] sm:scale-[0.85] lg:scale-[0.35]"
-          >
-            <div class="h-full px-3 py-3 sm:p-4 lg:p-8 text-[9px] sm:text-[10px]">
-              <!-- NOMBRE -->
-              <h2
-                class="text-[13px] sm:text-[14px] lg:text-3xl font-serif font-bold text-center border-b pb-1 lg:pb-3 mb-1 lg:mb-3"
-              >
-                {{ cv.name || 'Sin nombre' }}
-              </h2>
-
-              <!-- TÍTULO PROFESIONAL -->
-              <p
-                v-if="cv.title"
-                class="text-center italic text-blue-700 text-[9px] sm:text-[10px] lg:text-base mb-1 lg:mb-2"
-              >
-                {{ cv.title }}
-              </p>
-
-              <div class="text-[8px] sm:text-[9px] space-y-1.5 lg:space-y-2.5">
-                <!-- RESUMEN -->
-                <p class="line-clamp-3 text-justify">
-                  {{ shortText(cv.summary, 180) }}
-                </p>
-
-                <!-- EXPERIENCIA -->
-                <div v-if="cv.experience && cv.experience.length">
-                  <p class="font-bold uppercase tracking-tight mt-1">
-                    {{ currentLang === 'es' ? 'Experiencia' : 'Experience' }}
-                  </p>
-                  <div
-                    v-for="(job, jIdx) in firstItems(cv.experience, 2)"
-                    :key="jIdx"
-                    class="mt-0.5"
-                  >
-                    <p class="font-semibold">
-                      {{ job.company }}
-                    </p>
-                    <p class="italic">
-                      {{ job.role }}
-                    </p>
-                    <p class="line-clamp-2 text-justify">
-                      {{ shortText(job.description, 90) }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- PROYECTOS -->
-                <div v-if="cv.projects && cv.projects.length">
-                  <p class="font-bold uppercase tracking-tight mt-1">
-                    {{ currentLang === 'es' ? 'Proyectos' : 'Projects' }}
-                  </p>
-                  <div
-                    v-for="(proj, pIdx) in firstItems(cv.projects, 1)"
-                    :key="pIdx"
-                    class="mt-0.5"
-                  >
-                    <p class="font-semibold">
-                      {{ proj.name }}
-                    </p>
-                    <p class="line-clamp-2 text-justify">
-                      {{ shortText(proj.description, 80) }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- EDUCACIÓN -->
-                <div v-if="cv.education && cv.education.length">
-                  <p class="font-bold uppercase tracking-tight mt-1">
-                    {{ currentLang === 'es' ? 'Educación' : 'Education' }}
-                  </p>
-                  <div
-                    v-for="(edu, eIdx) in firstItems(cv.education, 1)"
-                    :key="eIdx"
-                    class="mt-0.5"
-                  >
-                    <p class="font-semibold">
-                      {{ edu.school }}
-                    </p>
-                    <p class="italic">
-                      {{ edu.degree }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- SKILLS cortas -->
-                <div v-if="cv.skills && typeof cv.skills === 'object'">
-                  <p class="font-bold uppercase tracking-tight mt-1">
-                    {{ currentLang === 'es' ? 'Habilidades' : 'Skills' }}
-                  </p>
-                  <p v-if="cv.skills.frontend" class="line-clamp-1">
-                    <strong>FE:</strong> {{ shortText(cv.skills.frontend, 50) }}
-                  </p>
-                  <p v-if="cv.skills.backend" class="line-clamp-1">
-                    <strong>BE:</strong> {{ shortText(cv.skills.backend, 50) }}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div class="absolute top-4 left-1/2 -translate-x-1/2 origin-top transform scale-[0.35] shadow-lg pointer-events-none select-none bg-white">
+            <ResumePreview
+              :cv-data="cv"
+              :settings="thumbnailSettings"
+              :current-lang="currentLang"
+              :export-mode="false"
+            />
           </div>
 
-          <!-- Botones duplicar / borrar -->
-          <div
-            class="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-3 group-hover:translate-x-0"
-          >
+          <div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <span class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-5 py-2 rounded-full font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">
+              {{ t('edit', currentLang) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center z-10 relative">
+          <div class="flex-1 min-w-0 pr-2">
+            <h3 class="font-bold text-gray-800 dark:text-white truncate text-sm" :title="cv.fileName || cv.name">
+              {{ cv.fileName || cv.name || 'CV Sin Título' }}
+            </h3>
+            <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+              <FileText size="10" /> {{ t('edited', currentLang) }}
+            </p>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button
+              @click.stop="handleDownload(cv)"
+              class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition"
+              :title="currentLang === 'es' ? 'Descargar (PDF o JSON)' : 'Download (PDF or JSON)'"
+            >
+              <Download size="16" />
+            </button>
+
             <button
               @click.stop="emit('duplicateCv', index)"
-              :title="t('duplicate', currentLang)"
-              class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-500 text-white shadow-lg flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition z-20"
+              class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded transition"
+              title="Duplicar"
             >
               <Copy size="16" />
             </button>
+
             <button
               @click.stop="emit('deleteCv', index)"
-              :title="t('delete', currentLang)"
-              class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-red-500 text-white shadow-lg flex items-center justify-center hover:bg-red-600 hover:scale-110 transition z-20"
+              class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition"
+              title="Eliminar"
             >
               <Trash2 size="16" />
             </button>
           </div>
-
-          <!-- Overlay EDIT -->
-          <div
-            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center pointer-events-none"
-          >
-            <div
-              class="bg-white text-black px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold transform translate-y-4 group-hover:translate-y-0 transition duration-300 shadow-xl text-xs sm:text-sm"
-            >
-              {{ t('edit', currentLang) }}
-            </div>
-          </div>
-        </div>
-
-        <!-- FOOTER CARD -->
-        <div
-          class="p-3 sm:p-4 bg-white dark:bg-gray-800 z-10 border-t dark:border-gray-700"
-        >
-          <h3
-            class="font-bold text-sm sm:text-base text-gray-800 dark:text-white truncate"
-          >
-            {{ cv.title || cv.name || t('edit', currentLang) }}
-          </h3>
-          <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
-            <FileText size="12" />
-            <span>{{ t('edited', currentLang) }}</span>
-          </p>
         </div>
       </div>
     </div>

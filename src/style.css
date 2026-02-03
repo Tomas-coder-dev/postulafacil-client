@@ -20,17 +20,17 @@ body {
 
 /* 3. Contenedor del CV: fondo gris solo en PANTALLA */
 #resume-preview {
-  background-color: #525659; /* Fondo gris para resaltar la hoja */
+  background-color: #525659;
   display: flex;
   justify-content: center;
   padding: 2rem;
-  overflow-y: auto; /* Scroll si la hoja es larga */
+  overflow-y: auto;
 }
 
 /* Tamaño base A4: el resto lo ajusta ResumePreview con variables */
 .resume-page {
-  width: 210mm;      /* Ancho exacto A4 */
-  min-height: 297mm; /* Alto mínimo A4 */
+  width: 210mm;
+  min-height: 297mm;
 }
 
 /* En IMPRESIÓN, quitamos fondo gris y sombras */
@@ -43,7 +43,7 @@ body {
   }
   #resume-preview {
     background: white !important;
-    padding: 0;
+    padding: 0 !important;
   }
   .resume-page {
     box-shadow: none !important;

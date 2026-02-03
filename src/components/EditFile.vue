@@ -1,18 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  Save,
-  FileJson,
-  Printer,
-  Upload,
-  Type,
-  FileText,
-  Palette,
-  Monitor,
-  SlidersHorizontal,
-  Download,
-  FilePenLine
-} from 'lucide-vue-next'
+import { Save, FileJson, Printer, Upload, Palette, Download, FilePenLine, Type, FileText, Monitor, SlidersHorizontal } from 'lucide-vue-next'
 import { translations } from '../utils/translations'
 
 type PaperSize = 'A4' | 'Letter'
@@ -49,7 +37,7 @@ const emit = defineEmits<{
 const t = (key: string) => translations[props.currentLang]?.[key] || key
 
 const localFileName = computed({
-  get: () => props.fileName || 'Nuevo_CV',
+  get: () => props.fileName || props.cvData?.fileName || 'Nuevo_CV',
   set: (val: string) => emit('update:fileName', val)
 })
 
@@ -57,89 +45,56 @@ const updateSetting = (key: keyof typeof props.settings, value: any) => {
   emit('update:settings', { ...props.settings, [key]: value })
 }
 
-const handleImportChange = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  if (!input.files || !input.files.length) return
-  emit('importJSON', input.files[0])
+const handleImportChange = (e: Event) => {
+  const input = e.target as HTMLInputElement
+  if (input.files?.length) emit('importJSON', input.files[0])
   input.value = ''
 }
 
-const themeColors = [
-  '#000000',
-  '#1F2937',
-  '#0F766E',
-  '#2563EB',
-  '#7C2D12',
-  '#B91C1C'
-]
+const themeColors = ['#000000', '#1F2937', '#0F766E', '#2563EB', '#7C2D12', '#B91C1C']
+const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7EB']
 </script>
 
 <template>
-  <div class="w-full flex flex-col bg-white dark:bg-gray-800 h-full print:hidden">
-    <!-- PANEL SUPERIOR -->
-    <div class="border-b border-gray-200 dark:border-gray-700 p-4 space-y-4">
-      <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-        <Download size="14" />
-        <span>{{ t('fileSection') }}</span>
+  <div class="flex flex-col h-full bg-white dark:bg-gray-800 custom-scrollbar overflow-y-auto">
+    <!-- ARCHIVO -->
+    <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500 mb-4">
+        <Download size="14" /> {{ t('fileSection') }}
       </div>
 
-      <div class="space-y-3 text-sm">
-        <div class="flex items-center gap-2">
-          <FilePenLine size="16" class="text-gray-500" />
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700">
+          <FilePenLine size="14" class="text-gray-500" />
           <input
             v-model="localFileName"
-            class="flex-1 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-600 text-xs px-1 py-0.5 outline-none text-gray-800 dark:text-gray-100"
+            class="bg-transparent text-sm w-full outline-none text-gray-800 dark:text-white font-semibold"
             :placeholder="t('fileNameLabel')"
           />
         </div>
 
-        <button
-          @click="emit('save')"
-          class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
-        >
-          <span class="inline-flex items-center gap-2">
-            <Save size="14" />
-            <span>{{ t('fileSave') }}</span>
-          </span>
-        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button @click="$emit('save')" class="btn-action"><Save size="14" /> {{ t('save') }}</button>
+          <button @click="$emit('printPDF')" class="btn-action"><Printer size="14" /> PDF</button>
+          <button @click="$emit('exportJSON')" class="btn-action"><FileJson size="14" /> JSON</button>
 
-        <button
-          @click="emit('printPDF')"
-          class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
-        >
-          <span class="inline-flex items-center gap-2">
-            <Printer size="14" />
-            <span>{{ t('fileExportPDF') }}</span>
-          </span>
-        </button>
-
-        <button
-          @click="emit('exportJSON')"
-          class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
-        >
-          <span class="inline-flex items-center gap-2">
-            <FileJson size="14" />
-            <span>{{ t('fileExportJSON') }}</span>
-          </span>
-        </button>
-
-        <label
-          class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200 cursor-pointer"
-        >
-          <span class="inline-flex items-center gap-2">
-            <Upload size="14" />
-            <span>{{ t('fileImportJSON') }}</span>
-          </span>
-          <input type="file" accept="application/json" class="hidden" @change="handleImportChange" />
-        </label>
+          <label class="btn-action cursor-pointer">
+            <Upload size="14" /> {{ t('import') }}
+            <input type="file" accept=".json,.pdf,.docx" class="hidden" @change="handleImportChange" />
+          </label>
+        </div>
       </div>
     </div>
 
-    <!-- AJUSTES -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs custom-scrollbar">
-      <!-- Tamaño -->
+    <!-- DISEÑO -->
+    <div class="p-5 space-y-6">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+        <Palette size="14" /> {{ props.currentLang === 'es' ? 'Diseño' : 'Design' }}
+      </div>
+
+      <!-- Tamaño de página -->
       <div class="space-y-1">
-        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
           <FileText size="14" />
           <span>{{ t('paperSize') }}</span>
         </div>
@@ -155,25 +110,21 @@ const themeColors = [
 
       <!-- Colores -->
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
           <Palette size="14" />
-          <span>{{ currentLang === 'es' ? 'Color de tema' : 'Theme color' }}</span>
+          <span>{{ props.currentLang === 'es' ? 'Colores' : 'Colors' }}</span>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[10px] text-gray-400 mr-1">
-            {{ currentLang === 'es' ? 'Títulos' : 'Headings' }}
-          </span>
-
+          <span class="text-[10px] text-gray-400 mr-1">{{ props.currentLang === 'es' ? 'Títulos' : 'Headings' }}</span>
           <button
-            v-for="color in themeColors"
-            :key="color"
+            v-for="c in themeColors"
+            :key="c"
             class="w-5 h-5 rounded-full border"
-            :class="color === props.settings.themeColor ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-300'"
-            :style="{ backgroundColor: color }"
-            @click="updateSetting('themeColor', color)"
+            :class="c === props.settings.themeColor ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-300'"
+            :style="{ backgroundColor: c }"
+            @click="updateSetting('themeColor', c)"
           ></button>
-
           <input
             :value="props.settings.themeColor"
             type="color"
@@ -183,19 +134,15 @@ const themeColors = [
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[10px] text-gray-400 mr-1">
-            {{ currentLang === 'es' ? 'Fondo' : 'Background' }}
-          </span>
-
+          <span class="text-[10px] text-gray-400 mr-1">{{ props.currentLang === 'es' ? 'Fondo hoja' : 'Page background' }}</span>
           <button
-            v-for="color in ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7EB']"
-            :key="color"
+            v-for="c in bgColors"
+            :key="c"
             class="w-5 h-5 rounded-full border"
-            :class="color === props.settings.pageBackground ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-300'"
-            :style="{ backgroundColor: color }"
-            @click="updateSetting('pageBackground', color)"
+            :class="c === props.settings.pageBackground ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-300'"
+            :style="{ backgroundColor: c }"
+            @click="updateSetting('pageBackground', c)"
           ></button>
-
           <input
             :value="props.settings.pageBackground"
             type="color"
@@ -207,15 +154,14 @@ const themeColors = [
 
       <!-- Tipografía -->
       <div class="space-y-1">
-        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
           <Type size="14" />
           <span>{{ t('fontFamily') }}</span>
         </div>
-
         <select
           :value="props.settings.fontFamily"
           @change="updateSetting('fontFamily', ($event.target as HTMLSelectElement).value)"
-          class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-800 dark:text-gray-100 mb-1"
+          class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-800 dark:text-gray-100"
         >
           <option value="Times New Roman, serif">Times New Roman</option>
           <option value="Georgia, serif">Georgia</option>
@@ -228,13 +174,12 @@ const themeColors = [
       <!-- Tamaño fuente -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
             <Type size="14" />
             <span>{{ t('fontSize') }}</span>
           </div>
           <span class="text-[10px] text-gray-400">{{ props.settings.fontSize }}pt</span>
         </div>
-
         <input
           type="range"
           min="9"
@@ -248,7 +193,7 @@ const themeColors = [
 
       <!-- Márgenes -->
       <div class="space-y-1">
-        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
           <SlidersHorizontal size="14" />
           <span>{{ t('margins') }}</span>
         </div>
@@ -258,7 +203,6 @@ const themeColors = [
             <span>{{ t('marginsTopBottom') }}</span>
             <span>{{ props.settings.marginTop }}px</span>
           </div>
-
           <input
             type="range"
             min="0"
@@ -268,7 +212,6 @@ const themeColors = [
             @input="updateSetting('marginTop', Number(($event.target as HTMLInputElement).value))"
             class="w-full accent-orange-400"
           />
-
           <input
             type="range"
             min="0"
@@ -280,12 +223,11 @@ const themeColors = [
           />
         </div>
 
-        <div class="space-y-1 mt-1">
+        <div class="space-y-1 mt-2">
           <div class="flex justify-between text-[10px] text-gray-400">
             <span>{{ t('marginsLeftRight') }}</span>
             <span>{{ props.settings.marginLeft }}px</span>
           </div>
-
           <input
             type="range"
             min="20"
@@ -295,7 +237,6 @@ const themeColors = [
             @input="updateSetting('marginLeft', Number(($event.target as HTMLInputElement).value))"
             class="w-full accent-orange-400"
           />
-
           <input
             type="range"
             min="20"
@@ -311,13 +252,12 @@ const themeColors = [
       <!-- Párrafos -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
             <FileText size="14" />
             <span>{{ t('paragraphSpacing') }}</span>
           </div>
           <span class="text-[10px] text-gray-400">{{ props.settings.paragraphSpacing }}px</span>
         </div>
-
         <input
           type="range"
           min="0"
@@ -332,13 +272,12 @@ const themeColors = [
       <!-- Interlineado -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
+          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
             <Monitor size="14" />
             <span>{{ t('lineSpacing') }}</span>
           </div>
           <span class="text-[10px] text-gray-400">{{ props.settings.lineSpacing.toFixed(2) }}</span>
         </div>
-
         <input
           type="range"
           min="1"
@@ -354,14 +293,10 @@ const themeColors = [
 </template>
 
 <style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+.btn-action {
+  @apply w-full inline-flex items-center justify-center gap-2 px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200 transition border border-gray-200 dark:border-gray-600 font-semibold;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 20px;
-}
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 20px; }
 </style>

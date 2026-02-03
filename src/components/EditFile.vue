@@ -32,6 +32,7 @@ const props = defineProps<{
     themeColor: string
     pageBackground: string
   }
+  fileName: string
   currentLang: 'es' | 'en'
 }>()
 
@@ -47,18 +48,15 @@ const emit = defineEmits<{
 // @ts-ignore
 const t = (key: string) => translations[props.currentLang]?.[key] || key
 
-// Nombre de archivo derivado del cvData
-const fileName = computed({
-  get: () => props.cvData?.fileName || 'Nuevo_CV',
+const localFileName = computed({
+  get: () => props.fileName || 'Nuevo_CV',
   set: (val: string) => emit('update:fileName', val)
 })
 
-// Actualiza el objeto settings completo con la clave cambiada
 const updateSetting = (key: keyof typeof props.settings, value: any) => {
   emit('update:settings', { ...props.settings, [key]: value })
 }
 
-// Importar JSON
 const handleImportChange = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (!input.files || !input.files.length) return
@@ -66,44 +64,35 @@ const handleImportChange = (event: Event) => {
   input.value = ''
 }
 
-// Presets de color de títulos
 const themeColors = [
-  '#000000', // negro
-  '#1F2937', // gris oscuro
-  '#0F766E', // teal
-  '#2563EB', // azul
-  '#7C2D12', // marrón
-  '#B91C1C'  // rojo
+  '#000000',
+  '#1F2937',
+  '#0F766E',
+  '#2563EB',
+  '#7C2D12',
+  '#B91C1C'
 ]
 </script>
 
 <template>
-  <div
-    class="w-full flex flex-col border-l border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 h-full print:hidden"
-  >
-    <!-- PANEL SUPERIOR: ARCHIVO -->
+  <div class="w-full flex flex-col bg-white dark:bg-gray-800 h-full print:hidden">
+    <!-- PANEL SUPERIOR -->
     <div class="border-b border-gray-200 dark:border-gray-700 p-4 space-y-4">
-      <div class="flex items-center justify-between mb-1">
-        <div
-          class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
-        >
-          <Download size="14" />
-          <span>{{ t('fileSection') }}</span>
-        </div>
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <Download size="14" />
+        <span>{{ t('fileSection') }}</span>
       </div>
 
       <div class="space-y-3 text-sm">
-        <!-- Nombre de archivo -->
         <div class="flex items-center gap-2">
           <FilePenLine size="16" class="text-gray-500" />
           <input
-            v-model="fileName"
+            v-model="localFileName"
             class="flex-1 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-600 text-xs px-1 py-0.5 outline-none text-gray-800 dark:text-gray-100"
             :placeholder="t('fileNameLabel')"
           />
         </div>
 
-        <!-- Guardar -->
         <button
           @click="emit('save')"
           class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
@@ -114,7 +103,6 @@ const themeColors = [
           </span>
         </button>
 
-        <!-- Exportar PDF -->
         <button
           @click="emit('printPDF')"
           class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
@@ -125,7 +113,6 @@ const themeColors = [
           </span>
         </button>
 
-        <!-- Exportar JSON -->
         <button
           @click="emit('exportJSON')"
           class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200"
@@ -136,7 +123,6 @@ const themeColors = [
           </span>
         </button>
 
-        <!-- Importar JSON -->
         <label
           class="w-full inline-flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200 cursor-pointer"
         >
@@ -144,25 +130,16 @@ const themeColors = [
             <Upload size="14" />
             <span>{{ t('fileImportJSON') }}</span>
           </span>
-          <input
-            type="file"
-            accept="application/json"
-            class="hidden"
-            @change="handleImportChange"
-          />
+          <input type="file" accept="application/json" class="hidden" @change="handleImportChange" />
         </label>
       </div>
     </div>
 
-    <!-- PANEL INFERIOR: AJUSTES -->
-    <div
-      class="flex-1 overflow-y-auto p-4 space-y-4 text-xs bg-white dark:bg-gray-800 custom-scrollbar"
-    >
-      <!-- Tamaño de página -->
+    <!-- AJUSTES -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 text-xs custom-scrollbar">
+      <!-- Tamaño -->
       <div class="space-y-1">
-        <div
-          class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-        >
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
           <FileText size="14" />
           <span>{{ t('paperSize') }}</span>
         </div>
@@ -176,20 +153,18 @@ const themeColors = [
         </select>
       </div>
 
-      <!-- COLORES DE TEMA -->
+      <!-- Colores -->
       <div class="space-y-2">
-        <div
-          class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-        >
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
           <Palette size="14" />
           <span>{{ currentLang === 'es' ? 'Color de tema' : 'Theme color' }}</span>
         </div>
 
-        <!-- Color de títulos -->
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[10px] text-gray-400 mr-1">
             {{ currentLang === 'es' ? 'Títulos' : 'Headings' }}
           </span>
+
           <button
             v-for="color in themeColors"
             :key="color"
@@ -198,6 +173,7 @@ const themeColors = [
             :style="{ backgroundColor: color }"
             @click="updateSetting('themeColor', color)"
           ></button>
+
           <input
             :value="props.settings.themeColor"
             type="color"
@@ -206,11 +182,11 @@ const themeColors = [
           />
         </div>
 
-        <!-- Fondo de hoja -->
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[10px] text-gray-400 mr-1">
             {{ currentLang === 'es' ? 'Fondo' : 'Background' }}
           </span>
+
           <button
             v-for="color in ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7EB']"
             :key="color"
@@ -219,6 +195,7 @@ const themeColors = [
             :style="{ backgroundColor: color }"
             @click="updateSetting('pageBackground', color)"
           ></button>
+
           <input
             :value="props.settings.pageBackground"
             type="color"
@@ -230,12 +207,11 @@ const themeColors = [
 
       <!-- Tipografía -->
       <div class="space-y-1">
-        <div
-          class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-        >
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
           <Type size="14" />
           <span>{{ t('fontFamily') }}</span>
         </div>
+
         <select
           :value="props.settings.fontFamily"
           @change="updateSetting('fontFamily', ($event.target as HTMLSelectElement).value)"
@@ -249,19 +225,16 @@ const themeColors = [
         </select>
       </div>
 
-      <!-- Tamaño de fuente -->
+      <!-- Tamaño fuente -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <div
-            class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-          >
+          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
             <Type size="14" />
             <span>{{ t('fontSize') }}</span>
           </div>
-          <span class="text-[10px] text-gray-400">
-            {{ props.settings.fontSize }}pt
-          </span>
+          <span class="text-[10px] text-gray-400">{{ props.settings.fontSize }}pt</span>
         </div>
+
         <input
           type="range"
           min="9"
@@ -275,19 +248,17 @@ const themeColors = [
 
       <!-- Márgenes -->
       <div class="space-y-1">
-        <div
-          class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-        >
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
           <SlidersHorizontal size="14" />
           <span>{{ t('margins') }}</span>
         </div>
 
-        <!-- Arriba y abajo -->
         <div class="space-y-1">
           <div class="flex justify-between text-[10px] text-gray-400">
             <span>{{ t('marginsTopBottom') }}</span>
             <span>{{ props.settings.marginTop }}px</span>
           </div>
+
           <input
             type="range"
             min="0"
@@ -297,6 +268,7 @@ const themeColors = [
             @input="updateSetting('marginTop', Number(($event.target as HTMLInputElement).value))"
             class="w-full accent-orange-400"
           />
+
           <input
             type="range"
             min="0"
@@ -308,12 +280,12 @@ const themeColors = [
           />
         </div>
 
-        <!-- Izquierda y derecha -->
         <div class="space-y-1 mt-1">
           <div class="flex justify-between text-[10px] text-gray-400">
             <span>{{ t('marginsLeftRight') }}</span>
             <span>{{ props.settings.marginLeft }}px</span>
           </div>
+
           <input
             type="range"
             min="20"
@@ -323,6 +295,7 @@ const themeColors = [
             @input="updateSetting('marginLeft', Number(($event.target as HTMLInputElement).value))"
             class="w-full accent-orange-400"
           />
+
           <input
             type="range"
             min="20"
@@ -335,19 +308,16 @@ const themeColors = [
         </div>
       </div>
 
-      <!-- Espaciado entre párrafos -->
+      <!-- Párrafos -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <div
-            class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-          >
+          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
             <FileText size="14" />
             <span>{{ t('paragraphSpacing') }}</span>
           </div>
-          <span class="text-[10px] text-gray-400">
-            {{ props.settings.paragraphSpacing }}px
-          </span>
+          <span class="text-[10px] text-gray-400">{{ props.settings.paragraphSpacing }}px</span>
         </div>
+
         <input
           type="range"
           min="0"
@@ -362,16 +332,13 @@ const themeColors = [
       <!-- Interlineado -->
       <div class="space-y-1">
         <div class="flex items-center justify-between">
-          <div
-            class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide"
-          >
+          <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide">
             <Monitor size="14" />
             <span>{{ t('lineSpacing') }}</span>
           </div>
-          <span class="text-[10px] text-gray-400">
-            {{ props.settings.lineSpacing.toFixed(2) }}
-          </span>
+          <span class="text-[10px] text-gray-400">{{ props.settings.lineSpacing.toFixed(2) }}</span>
         </div>
+
         <input
           type="range"
           min="1"

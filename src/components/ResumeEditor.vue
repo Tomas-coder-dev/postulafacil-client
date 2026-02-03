@@ -1,38 +1,31 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed } from 'vue'
 import { Trash2 } from 'lucide-vue-next'
 import { translations } from '../utils/translations'
 
 const props = defineProps<{
-  initialData: any
+  cvData: any
   currentLang: 'es' | 'en'
 }>()
 
 const emit = defineEmits<{
-  (e: 'save', payload: any): void
+  (e: 'update:cvData', value: any): void
+  (e: 'save'): void
   (e: 'back'): void
 }>()
 
 // @ts-ignore
 const t = (key: string) => translations[props.currentLang]?.[key] || key
 
-const cvData = ref(JSON.parse(JSON.stringify(props.initialData)))
+// v-model:cvData (estado único)
+const cvDataLocal = computed({
+  get: () => props.cvData,
+  set: (val: any) => emit('update:cvData', val)
+})
 
-watch(
-  () => props.initialData,
-  (val) => {
-    cvData.value = JSON.parse(JSON.stringify(val))
-  }
-)
-
-const saveChanges = () => {
-  emit('save', cvData.value)
-}
-
-// Helpers
 const ensureSkillsObject = () => {
-  if (!cvData.value.skills || typeof cvData.value.skills !== 'object') {
-    cvData.value.skills = {
+  if (!cvDataLocal.value.skills || typeof cvDataLocal.value.skills !== 'object') {
+    cvDataLocal.value.skills = {
       frontend: '',
       backend: '',
       db: '',
@@ -44,142 +37,112 @@ const ensureSkillsObject = () => {
 }
 
 const addCertification = () => {
-  if (!Array.isArray(cvData.value.certifications)) {
-    cvData.value.certifications = []
+  if (!Array.isArray(cvDataLocal.value.certifications)) {
+    cvDataLocal.value.certifications = []
   }
-  cvData.value.certifications.push('')
+  cvDataLocal.value.certifications.push('')
 }
 </script>
 
 <template>
-  <div
-    class="flex flex-col h-full overflow-hidden font-sans bg-white dark:bg-gray-800 transition-colors duration-300"
-  >
-    <div
-      class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900"
-    >
+  <div class="flex flex-col h-full overflow-hidden font-sans bg-white dark:bg-gray-800 transition-colors duration-300">
+    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900">
       <div class="flex items-center gap-2">
         <button
-          @click="emit('back')"
+          @click="$emit('back')"
           class="text-xs text-gray-500 hover:text-postula-blue flex items-center gap-1 font-semibold"
         >
           ‹ {{ t('back') }}
         </button>
-        <span
-          class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200"
-        >
+        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200">
           {{ t('editorTag') }}
         </span>
       </div>
       <button
-        @click="saveChanges"
+        @click="$emit('save')"
         class="text-xs font-semibold text-postula-blue hover:underline"
       >
         {{ t('save') }}
       </button>
     </div>
 
-    <div
-      class="p-4 md:p-6 overflow-y-auto flex-1 space-y-8 custom-scrollbar bg-white dark:bg-gray-800"
-    >
+    <div class="p-4 md:p-6 overflow-y-auto flex-1 space-y-8 custom-scrollbar bg-white dark:bg-gray-800">
       <!-- INFO PERSONAL -->
       <section class="space-y-4">
-        <h3 class="section-header">
-          {{ t('personalInfo') }}
-        </h3>
+        <h3 class="section-header">{{ t('personalInfo') }}</h3>
+
         <div>
           <label class="label">{{ t('nameFull') }}</label>
-          <input v-model="cvData.name" class="input-field" />
+          <input v-model="cvDataLocal.name" class="input-field" />
         </div>
+
         <div>
           <label class="label">{{ t('professionalTitle') }}</label>
-          <input v-model="cvData.title" class="input-field" />
+          <input v-model="cvDataLocal.title" class="input-field" />
         </div>
+
         <div>
           <label class="label">{{ t('summaryLabel') }}</label>
-          <textarea
-            v-model="cvData.summary"
-            rows="4"
-            class="input-field"
-          ></textarea>
+          <textarea v-model="cvDataLocal.summary" rows="4" class="input-field"></textarea>
         </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="label">Email</label>
-            <input v-model="cvData.email" class="input-field" />
+            <input v-model="cvDataLocal.email" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('phoneLabel') }}</label>
-            <input v-model="cvData.phone" class="input-field" />
+            <input v-model="cvDataLocal.phone" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('locationLabel') }}</label>
-            <input v-model="cvData.location" class="input-field" />
+            <input v-model="cvDataLocal.location" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('linkedinLabel') }}</label>
-            <input v-model="cvData.linkedin" class="input-field" />
+            <input v-model="cvDataLocal.linkedin" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('githubLabel') }}</label>
-            <input v-model="cvData.github" class="input-field" />
+            <input v-model="cvDataLocal.github" class="input-field" />
           </div>
         </div>
       </section>
 
       <!-- EXPERIENCIA -->
       <section class="space-y-4">
-        <div
-          class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1"
-        >
-          <h3 class="section-header !border-0 !mb-0">
-            {{ t('experience') }}
-          </h3>
+        <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1">
+          <h3 class="section-header !border-0 !mb-0">{{ t('experience') }}</h3>
           <button
-            @click="cvData.experience.push({ company: '', role: '', date: '', location: '', description: '' })"
+            @click="cvDataLocal.experience.push({ company: '', role: '', date: '', location: '', description: '' })"
             class="add-btn"
           >
             + {{ t('addExperience') }}
           </button>
         </div>
 
-        <div
-          v-for="(job, index) in cvData.experience"
-          :key="index"
-          class="card-item"
-        >
+        <div v-for="(job, index) in cvDataLocal.experience" :key="index" class="card-item">
           <div class="flex justify-between mb-2 gap-2">
             <input
               v-model="job.company"
               class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white placeholder-gray-400"
               :placeholder="t('companyPlaceholder')"
             />
-            <button
-              @click="cvData.experience.splice(index, 1)"
-              class="del-btn"
-            >
+            <button @click="cvDataLocal.experience.splice(index, 1)" class="del-btn">
               <Trash2 size="14" />
             </button>
           </div>
+
           <div class="grid grid-cols-2 gap-2 mb-2">
-            <input
-              v-model="job.role"
-              class="input-sm"
-              :placeholder="t('rolePlaceholder')"
-            />
-            <input
-              v-model="job.date"
-              class="input-sm"
-              :placeholder="t('datePlaceholder')"
-            />
+            <input v-model="job.role" class="input-sm" :placeholder="t('rolePlaceholder')" />
+            <input v-model="job.date" class="input-sm" :placeholder="t('datePlaceholder')" />
           </div>
+
           <div class="grid grid-cols-1 gap-2 mb-2">
-            <input
-              v-model="job.location"
-              class="input-sm"
-              :placeholder="t('jobLocationPlaceholder')"
-            />
+            <input v-model="job.location" class="input-sm" :placeholder="t('jobLocationPlaceholder')" />
           </div>
+
           <textarea
             v-model="job.description"
             rows="3"
@@ -191,98 +154,58 @@ const addCertification = () => {
 
       <!-- PROYECTOS -->
       <section class="space-y-4">
-        <div
-          class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1"
-        >
-          <h3 class="section-header !border-0 !mb-0">
-            {{ t('projects') }}
-          </h3>
+        <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1">
+          <h3 class="section-header !border-0 !mb-0">{{ t('projects') }}</h3>
           <button
-            @click="cvData.projects.push({ name: '', description: '', tech: '' })"
+            @click="cvDataLocal.projects.push({ name: '', description: '', tech: '' })"
             class="add-btn"
           >
             + {{ t('addProject') }}
           </button>
         </div>
 
-        <div
-          v-for="(proj, index) in cvData.projects"
-          :key="index"
-          class="card-item"
-        >
+        <div v-for="(proj, index) in cvDataLocal.projects" :key="index" class="card-item">
           <div class="flex justify-between mb-1 gap-2">
             <input
               v-model="proj.name"
               class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white"
               :placeholder="t('projectNamePlaceholder')"
             />
-            <button
-              @click="cvData.projects.splice(index, 1)"
-              class="del-btn"
-            >
+            <button @click="cvDataLocal.projects.splice(index, 1)" class="del-btn">
               <Trash2 size="14" />
             </button>
           </div>
+
           <textarea
             v-model="proj.description"
             rows="2"
             class="input-sm w-full mb-2 bg-white dark:bg-gray-900"
             :placeholder="t('projectDescriptionPlaceholder')"
           ></textarea>
-          <input
-            v-model="proj.tech"
-            class="input-sm w-full"
-            :placeholder="t('projectTechPlaceholder')"
-          />
+
+          <input v-model="proj.tech" class="input-sm w-full" :placeholder="t('projectTechPlaceholder')" />
         </div>
       </section>
 
       <!-- EDUCACIÓN -->
       <section class="space-y-4">
-        <div
-          class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1"
-        >
-          <h3 class="section-header !border-0 !mb-0">
-            {{ t('education') }}
-          </h3>
+        <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1">
+          <h3 class="section-header !border-0 !mb-0">{{ t('education') }}</h3>
           <button
-            @click="cvData.education.push({ school: '', degree: '', date: '', location: '' })"
+            @click="cvDataLocal.education.push({ school: '', degree: '', date: '', location: '' })"
             class="add-btn"
           >
             + {{ t('addEducation') }}
           </button>
         </div>
 
-        <div
-          v-for="(edu, index) in cvData.education"
-          :key="index"
-          class="card-item grid grid-cols-2 gap-2"
-        >
-          <input
-            v-model="edu.school"
-            class="input-sm font-bold col-span-2"
-            :placeholder="t('educationInstitutionPlaceholder')"
-          />
-          <input
-            v-model="edu.degree"
-            class="input-sm"
-            :placeholder="t('educationDegreePlaceholder')"
-          />
-          <input
-            v-model="edu.date"
-            class="input-sm"
-            :placeholder="t('educationDatePlaceholder')"
-          />
-          <input
-            v-model="edu.location"
-            class="input-sm col-span-2"
-            :placeholder="t('educationLocationPlaceholder')"
-          />
+        <div v-for="(edu, index) in cvDataLocal.education" :key="index" class="card-item grid grid-cols-2 gap-2">
+          <input v-model="edu.school" class="input-sm font-bold col-span-2" :placeholder="t('educationInstitutionPlaceholder')" />
+          <input v-model="edu.degree" class="input-sm" :placeholder="t('educationDegreePlaceholder')" />
+          <input v-model="edu.date" class="input-sm" :placeholder="t('educationDatePlaceholder')" />
+          <input v-model="edu.location" class="input-sm col-span-2" :placeholder="t('educationLocationPlaceholder')" />
           <div class="col-span-2 flex justify-end">
-            <button
-              @click="cvData.education.splice(index, 1)"
-              class="del-btn"
-            >
+            <button @click="cvDataLocal.education.splice(index, 1)" class="del-btn">
               <Trash2 size="14" />
             </button>
           </div>
@@ -291,34 +214,16 @@ const addCertification = () => {
 
       <!-- CERTIFICACIONES -->
       <section class="space-y-4">
-        <div
-          class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1"
-        >
-          <h3 class="section-header !border-0 !mb-0">
-            {{ t('cv_certificationsTitle') }}
-          </h3>
+        <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1">
+          <h3 class="section-header !border-0 !mb-0">{{ t('cv_certificationsTitle') }}</h3>
           <button @click="addCertification" class="add-btn">
-            + {{
-              props.currentLang === 'es'
-                ? 'Agregar certificación'
-                : 'Add certification'
-            }}
+            + {{ props.currentLang === 'es' ? 'Agregar certificación' : 'Add certification' }}
           </button>
         </div>
 
-        <div
-          v-for="(cert, index) in cvData.certifications"
-          :key="index"
-          class="flex gap-2 items-center"
-        >
-          <input
-            v-model="cvData.certifications[index]"
-            class="input-field flex-1"
-          />
-          <button
-            @click="cvData.certifications.splice(index, 1)"
-            class="del-btn self-center"
-          >
+        <div v-for="(cert, index) in cvDataLocal.certifications" :key="index" class="flex gap-2 items-center">
+          <input v-model="cvDataLocal.certifications[index]" class="input-field flex-1" />
+          <button @click="cvDataLocal.certifications.splice(index, 1)" class="del-btn self-center">
             <Trash2 size="14" />
           </button>
         </div>
@@ -327,45 +232,36 @@ const addCertification = () => {
       <!-- HABILIDADES -->
       <section class="space-y-4">
         <div class="flex justify-between items-center">
-          <h3 class="section-header !border-b-0 !mb-0">
-            {{ t('skills') }}
-          </h3>
+          <h3 class="section-header !border-b-0 !mb-0">{{ t('skills') }}</h3>
           <button @click="ensureSkillsObject" class="add-btn">
-            {{
-              props.currentLang === 'es'
-                ? '+ Agregar habilidades'
-                : '+ Add skills'
-            }}
+            {{ props.currentLang === 'es' ? '+ Agregar habilidades' : '+ Add skills' }}
           </button>
         </div>
 
-        <div
-          v-if="cvData.skills && typeof cvData.skills === 'object'"
-          class="space-y-3"
-        >
+        <div v-if="cvDataLocal.skills && typeof cvDataLocal.skills === 'object'" class="space-y-3">
           <div>
             <label class="label">{{ t('skillsFrontend') }}</label>
-            <input v-model="cvData.skills.frontend" class="input-field" />
+            <input v-model="cvDataLocal.skills.frontend" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsBackend') }}</label>
-            <input v-model="cvData.skills.backend" class="input-field" />
+            <input v-model="cvDataLocal.skills.backend" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsDB') }}</label>
-            <input v-model="cvData.skills.db" class="input-field" />
+            <input v-model="cvDataLocal.skills.db" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsTools') }}</label>
-            <input v-model="cvData.skills.tools" class="input-field" />
+            <input v-model="cvDataLocal.skills.tools" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsLanguages') }}</label>
-            <input v-model="cvData.skills.languages" class="input-field" />
+            <input v-model="cvDataLocal.skills.languages" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsOther') }}</label>
-            <input v-model="cvData.skills.other" class="input-field" />
+            <input v-model="cvDataLocal.skills.other" class="input-field" />
           </div>
         </div>
       </section>

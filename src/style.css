@@ -1,0 +1,76 @@
+/* 1. Directivas de Tailwind (Obligatorias) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 2. Reset básico para que ocupe toda la pantalla */
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  /* Quitamos el display: flex que traía Vite por defecto para que no centre todo */
+  display: block; 
+}
+
+/* 3. Estilos de la Hoja A4 (Harvard Style) */
+#resume-preview {
+  /* Fondo gris claro para que resalte la hoja blanca */
+  background-color: #525659; 
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto; /* Scroll si la hoja es larga */
+}
+
+.resume-page {
+  background-color: white;
+  color: black;
+  width: 210mm; /* Ancho exacto A4 */
+  min-height: 297mm; /* Alto mínimo A4 */
+  padding: 40px 50px; /* Márgenes internos estilo Harvard */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  font-family: 'Times New Roman', Times, serif; /* Fuente clásica académica */
+  
+  /* Variable CSS para controlar el interlineado desde el slider */
+  line-height: var(--line-spacing, 1.5); 
+}
+
+/* Títulos de secciones con la línea azul debajo */
+.resume-page h2 {
+  font-size: 14pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #000;
+  border-bottom: 1px solid #377BB5; /* Tu color azul */
+  margin-top: 15pt;
+  margin-bottom: 6pt;
+  padding-bottom: 2px;
+}
+
+/* Encabezado Principal (Nombre) */
+.resume-page h1 {
+  font-size: 24pt;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  line-height: 1.2;
+}
+
+/* Texto general */
+.resume-page p, .resume-page li, .resume-page span {
+  font-size: 11pt;
+}
+
+/* Listas */
+.resume-page ul {
+  padding-left: 1.2rem;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}

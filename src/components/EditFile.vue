@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Save, FileJson, Printer, Upload, Palette, Download, FilePenLine, Type, FileText, Monitor, SlidersHorizontal } from 'lucide-vue-next'
+import {
+  Save,
+  FileJson,
+  Printer,
+  Upload,
+  Palette,
+  Download,
+  FilePenLine,
+  Type,
+  FileText,
+  Monitor
+} from 'lucide-vue-next'
 import { translations } from '../utils/translations'
 
 type PaperSize = 'A4' | 'Letter'
@@ -189,64 +200,6 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
           @input="updateSetting('fontSize', Number(($event.target as HTMLInputElement).value))"
           class="w-full accent-orange-400"
         />
-      </div>
-
-      <!-- Márgenes -->
-      <div class="space-y-1">
-        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
-          <SlidersHorizontal size="14" />
-          <span>{{ t('margins') }}</span>
-        </div>
-
-        <div class="space-y-1">
-          <div class="flex justify-between text-[10px] text-gray-400">
-            <span>{{ t('marginsTopBottom') }}</span>
-            <span>{{ props.settings.marginTop }}px</span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="80"
-            step="2"
-            :value="props.settings.marginTop"
-            @input="updateSetting('marginTop', Number(($event.target as HTMLInputElement).value))"
-            class="w-full accent-orange-400"
-          />
-          <input
-            type="range"
-            min="0"
-            max="80"
-            step="2"
-            :value="props.settings.marginBottom"
-            @input="updateSetting('marginBottom', Number(($event.target as HTMLInputElement).value))"
-            class="w-full accent-orange-400 mt-1"
-          />
-        </div>
-
-        <div class="space-y-1 mt-2">
-          <div class="flex justify-between text-[10px] text-gray-400">
-            <span>{{ t('marginsLeftRight') }}</span>
-            <span>{{ props.settings.marginLeft }}px</span>
-          </div>
-          <input
-            type="range"
-            min="20"
-            max="80"
-            step="2"
-            :value="props.settings.marginLeft"
-            @input="updateSetting('marginLeft', Number(($event.target as HTMLInputElement).value))"
-            class="w-full accent-orange-400"
-          />
-          <input
-            type="range"
-            min="20"
-            max="80"
-            step="2"
-            :value="props.settings.marginRight"
-            @input="updateSetting('marginRight', Number(($event.target as HTMLInputElement).value))"
-            class="w-full accent-orange-400 mt-1"
-          />
-        </div>
       </div>
 
       <!-- Párrafos -->

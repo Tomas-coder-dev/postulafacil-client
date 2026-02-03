@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import EditFile from '../components/EditFile.vue'
 
-// @ts-ignore
-import html2pdf from 'html2pdf.js'
 import * as mammoth from 'mammoth'
 import * as pdfjsLib from 'pdfjs-dist'
+
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
 // @ts-ignore
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`
@@ -52,7 +53,9 @@ watch(
 
     syncingFromCv = true
     settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
-    queueMicrotask(() => { syncingFromCv = false })
+    queueMicrotask(() => {
+      syncingFromCv = false
+    })
   },
   { immediate: true }
 )
@@ -71,6 +74,16 @@ watch(
 const handleSave = () => emit('save', cvData.value)
 const handleBack = () => emit('back')
 
+/** ---------- Responsive tabs (mobile/tablet) ---------- */
+type MobileTab = 'editor' | 'preview' | 'design'
+const mobileTab = ref<MobileTab>('preview')
+
+const tabLabel = computed(() => {
+  if (props.currentLang === 'es') return { editor: 'Editor', preview: 'Vista', design: 'Diseño' }
+  return { editor: 'Editor', preview: 'Preview', design: 'Design' }
+})
+
+/** ---------- Export JSON ---------- */
 const handleExportJSON = () => {
   const blob = new Blob([JSON.stringify(cvData.value, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
@@ -81,33 +94,150 @@ const handleExportJSON = () => {
   URL.revokeObjectURL(url)
 }
 
-const handleExportPDF = async () => {
-  const src = document.getElementById('resume-preview-content')
-  if (!src) return
-
-  const clone = src.cloneNode(true) as HTMLElement
-  clone.style.transform = 'none'
-  clone.style.background = '#ffffff'
-  clone.style.boxShadow = 'none'
-
-  const wrapper = document.createElement('div')
-  wrapper.style.background = '#ffffff'
-  wrapper.style.padding = '0'
-  wrapper.style.margin = '0'
-  wrapper.appendChild(clone)
-
-  const opt = {
-    margin: 0,
-    filename: `${(cvData.value.fileName || 'CV').replace(/\s+/g, '_')}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-    jsPDF: { unit: 'mm', format: settings.value.paperSize === 'Letter' ? 'letter' : 'a4', orientation: 'portrait' }
-  }
-
-  // @ts-ignore
-  await html2pdf().set(opt).from(wrapper).save()
+/** ---------- Export helpers ---------- */
+const waitTwoFrames = async () => {
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
 }
 
+const waitFonts = async () => {
+  // @ts-ignore
+  if (document.fonts?.ready) {
+    // @ts-ignore
+    await document.fonts.ready
+  }
+}
+
+const buildSandbox = () => {
+  const sandbox = document.createElement('div')
+  sandbox.id = 'pdf-export-sandbox'
+  sandbox.style.position = 'fixed'
+  sandbox.style.left = '-99999px'
+  sandbox.style.top = '0'
+  sandbox.style.background = '#ffffff'
+  sandbox.style.padding = '0'
+  sandbox.style.margin = '0'
+  sandbox.style.zIndex = '-1'
+  sandbox.style.pointerEvents = 'none'
+  return sandbox
+}
+
+/**
+ * Export PDF SIN blanco y multipágina alineada:
+ * - Captura desde un clon con tamaño fijo (px)
+ * - NO usa foreignObjectRendering (evita canvas vacío)
+ * - Divide por slices (cada página desde 0,0)
+ */
+const handleExportPDF = async () => {
+  const pageEl =
+    document.querySelector<HTMLElement>('#resume-preview-content.resume-page') ??
+    document.querySelector<HTMLElement>('#resume-preview-content .resume-page') ??
+    document.querySelector<HTMLElement>('.resume-page')
+
+  if (!pageEl) {
+    alert(props.currentLang === 'es' ? 'No se encontró la hoja del CV.' : 'CV page not found.')
+    return
+  }
+
+  const isLetter = settings.value.paperSize === 'Letter'
+  const pdfFormat = isLetter ? 'letter' : 'a4'
+
+  // Tamaño fijo en px (independiente del viewport)
+  const targetWidthPx = isLetter ? 850 : 794
+
+  // Clonar hoja
+  const clone = pageEl.cloneNode(true) as HTMLElement
+  clone.style.transform = 'none'
+  clone.style.boxShadow = 'none'
+  clone.style.margin = '0'
+  clone.style.background = '#ffffff'
+  clone.style.overflow = 'visible'
+  clone.style.width = `${targetWidthPx}px`
+  clone.style.maxWidth = `${targetWidthPx}px`
+  clone.style.paddingBottom = '60px' // buffer contra cortes feos
+
+  const sandbox = buildSandbox()
+  sandbox.appendChild(clone)
+  document.body.appendChild(sandbox)
+
+  try {
+    await waitFonts()
+    await waitTwoFrames()
+
+    // Medidas reales ya renderizadas
+    const exportWidth = clone.scrollWidth
+    const exportHeight = clone.scrollHeight
+
+    const canvas = await html2canvas(clone, {
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      scale: 2,
+      scrollX: 0,
+      scrollY: 0,
+      width: exportWidth,
+      height: exportHeight,
+      windowWidth: exportWidth,
+      windowHeight: exportHeight
+    })
+
+    // Si aún así queda blanco, lo detectamos
+    const ctxTest = canvas.getContext('2d')
+    const pixel = ctxTest?.getImageData(0, 0, 1, 1).data
+    const isBlank = pixel ? pixel[0] === 255 && pixel[1] === 255 && pixel[2] === 255 && pixel[3] === 255 : false
+    if (isBlank && exportHeight > 50) {
+      alert(
+        props.currentLang === 'es'
+          ? 'La captura salió en blanco. Revisa si hay extensiones (dark reader) o estilos globales con filter/transform.'
+          : 'Capture is blank. Check extensions (dark reader) or global CSS filter/transform.'
+      )
+      return
+    }
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: pdfFormat
+    })
+
+    const pdfW = pdf.internal.pageSize.getWidth()
+    const pdfH = pdf.internal.pageSize.getHeight()
+
+    // Altura en px equivalente a 1 página, basado en ratio PDF
+    const pageHeightPx = Math.floor((canvas.width * pdfH) / pdfW)
+    const pageCount = Math.ceil(canvas.height / pageHeightPx)
+
+    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+      const sliceCanvas = document.createElement('canvas')
+      const sliceCtx = sliceCanvas.getContext('2d')
+
+      const sliceY = pageIndex * pageHeightPx
+      const sliceH = Math.min(pageHeightPx, canvas.height - sliceY)
+
+      sliceCanvas.width = canvas.width
+      sliceCanvas.height = sliceH
+
+      if (!sliceCtx) continue
+      sliceCtx.fillStyle = '#ffffff'
+      sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height)
+
+      sliceCtx.drawImage(canvas, 0, sliceY, canvas.width, sliceH, 0, 0, canvas.width, sliceH)
+
+      const imgData = sliceCanvas.toDataURL('image/jpeg', 0.98)
+
+      if (pageIndex > 0) pdf.addPage()
+
+      const imgWmm = pdfW
+      const imgHmm = (sliceH * imgWmm) / canvas.width
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWmm, imgHmm, undefined, 'FAST')
+    }
+
+    pdf.save(`${(cvData.value.fileName || 'CV').replace(/\s+/g, '_')}.pdf`)
+  } finally {
+    document.body.removeChild(sandbox)
+  }
+}
+
+/** ---------- Import ---------- */
 const handleImportFile = async (file: File) => {
   if (!file) return
   const ext = file.name.split('.').pop()?.toLowerCase()
@@ -124,7 +254,9 @@ const handleImportFile = async (file: File) => {
 
         syncingFromCv = true
         settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
-        queueMicrotask(() => { syncingFromCv = false })
+        queueMicrotask(() => {
+          syncingFromCv = false
+        })
       } catch {
         alert(props.currentLang === 'es' ? 'JSON inválido' : 'Invalid JSON')
       }
@@ -176,33 +308,75 @@ const handleImportFile = async (file: File) => {
 </script>
 
 <template>
-  <div class="flex h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900 overflow-hidden">
-    <div class="w-2/5 overflow-y-auto print:hidden">
-      <ResumeEditor
-        v-model:cvData="cvData"
-        :current-lang="currentLang"
-        @save="handleSave"
-        @back="handleBack"
-      />
-    </div>
+  <div class="bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
+    <div class="lg:hidden sticky top-0 z-20 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-3 py-2 print:hidden">
+      <div class="grid grid-cols-3 gap-2">
+        <button
+          type="button"
+          class="px-3 py-2 rounded text-xs font-semibold border"
+          :class="mobileTab === 'editor'
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
+          @click="mobileTab = 'editor'"
+        >
+          {{ tabLabel.editor }}
+        </button>
 
-    <div class="flex-1 flex justify-center p-4 overflow-y-auto bg-gray-200 dark:bg-gray-900/40">
-      <div class="transform scale-[0.7] md:scale-[0.85] xl:scale-100 origin-top">
-        <ResumePreview :cv-data="cvData" :settings="settings" :current-lang="currentLang" :export-mode="true" />
+        <button
+          type="button"
+          class="px-3 py-2 rounded text-xs font-semibold border"
+          :class="mobileTab === 'preview'
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
+          @click="mobileTab = 'preview'"
+        >
+          {{ tabLabel.preview }}
+        </button>
+
+        <button
+          type="button"
+          class="px-3 py-2 rounded text-xs font-semibold border"
+          :class="mobileTab === 'design'
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
+          @click="mobileTab = 'design'"
+        >
+          {{ tabLabel.design }}
+        </button>
       </div>
     </div>
 
-    <div class="w-1/4 bg-white dark:bg-gray-800 print:hidden overflow-y-auto border-l border-gray-300 dark:border-gray-700">
-      <EditFile
-        v-model:settings="settings"
-        v-model:fileName="cvData.fileName"
-        :cv-data="cvData"
-        :current-lang="currentLang"
-        @save="handleSave"
-        @exportJSON="handleExportJSON"
-        @importJSON="handleImportFile"
-        @printPDF="handleExportPDF"
-      />
+    <div class="flex flex-col lg:flex-row lg:h-[calc(100vh-64px)] overflow-hidden">
+      <div class="lg:w-2/5 lg:overflow-y-auto print:hidden" :class="mobileTab === 'editor' ? 'block' : 'hidden lg:block'">
+        <ResumeEditor v-model:cvData="cvData" :current-lang="currentLang" @save="handleSave" @back="handleBack" />
+      </div>
+
+      <div
+        class="flex-1 flex justify-center p-3 sm:p-4 overflow-y-auto bg-gray-200 dark:bg-gray-900/40"
+        :class="mobileTab === 'preview' ? 'block' : 'hidden lg:flex'"
+      >
+        <div class="w-full flex justify-center">
+          <div class="transform lg:scale-100 scale-[0.92] sm:scale-100 origin-top">
+            <ResumePreview :cv-data="cvData" :settings="settings" :current-lang="currentLang" :export-mode="true" />
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="lg:w-1/4 bg-white dark:bg-gray-800 print:hidden lg:overflow-y-auto border-l border-gray-300 dark:border-gray-700"
+        :class="mobileTab === 'design' ? 'block' : 'hidden lg:block'"
+      >
+        <EditFile
+          v-model:settings="settings"
+          v-model:fileName="cvData.fileName"
+          :cv-data="cvData"
+          :current-lang="currentLang"
+          @save="handleSave"
+          @exportJSON="handleExportJSON"
+          @importJSON="handleImportFile"
+          @printPDF="handleExportPDF"
+        />
+      </div>
     </div>
   </div>
 </template>

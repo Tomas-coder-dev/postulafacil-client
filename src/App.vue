@@ -58,6 +58,21 @@ const fabricioCV = {
         'Desarrollo de funcionalidades CRUD, reportes automatizados y control de inventarios.',
         'Trabajo bajo metodología ágil y elaboración de documentación técnica del sistema.'
       ]
+    },
+    {
+      company: 'Syncra Connect (Proyecto CRM – Unilene)',
+      role: 'Desarrollador Full Stack',
+      date: 'Feb 2026 – Jun 2026',
+      location: 'Lima, Peru',
+      description: [
+        'Desarrollo y mantenimiento de funcionalidades para CRM empresarial.',
+        'Implementación y consumo de APIs REST utilizando .NET.',
+        'Desarrollo de interfaces y componentes frontend utilizando Angular.',
+        'Participación en desarrollo de funcionalidades móviles utilizando Flutter.',
+        'Creación y mantenimiento de consultas y procedimientos en SQL Server.',
+        'Corrección de incidencias y optimización de funcionalidades existentes.',
+        'Trabajo colaborativo mediante Git y control de versiones.'
+      ]
     }
   ],
   projects: [
@@ -70,6 +85,11 @@ const fabricioCV = {
       name: 'Mejora de Plataforma Web CEDITEC',
       description: 'Rediseño de la interfaz UX/UI y optimización de funcionalidades de la biblioteca digital.',
       tech: 'Laravel, MySQL, TailwindCSS'
+    },
+    {
+      name: 'PostulaFácil — Plataforma Inteligente para Creación y Gestión de CVs',
+      description: 'Aplicación web para creación, edición y administración de currículums con enfoque en privacidad y personalización.',
+      tech: 'Vue.js 3, TypeScript, Composition API, TailwindCSS, JSON, PDF Export'
     }
   ],
   education: [
@@ -198,7 +218,6 @@ const toggleTheme = () => {
 }
 
 const editCv = (idx: number) => {
-  // Evita crash si llega algo raro
   if (typeof idx !== 'number' || idx < 0 || idx >= cvList.value.length) return
   selectedCvIndex.value = idx
   currentView.value = 'editor'

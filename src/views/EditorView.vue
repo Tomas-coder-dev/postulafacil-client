@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, nextTick } from 'vue'
+import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import EditFile from '../components/EditFile.vue'
@@ -7,7 +7,6 @@ import EditFile from '../components/EditFile.vue'
 import * as mammoth from 'mammoth'
 import * as pdfjsLib from 'pdfjs-dist'
 
-// @ts-ignore
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`
 
 const props = defineProps<{
@@ -44,15 +43,11 @@ watch(
   (val) => {
     if (!val) return
     cvData.value = val
-
     if (!cvData.value.meta) cvData.value.meta = {}
     if (!cvData.value.meta.settings) cvData.value.meta.settings = { ...defaultSettings }
-
     syncingFromCv = true
     settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
-    queueMicrotask(() => {
-      syncingFromCv = false
-    })
+    queueMicrotask(() => { syncingFromCv = false })
   },
   { immediate: true }
 )
@@ -71,7 +66,6 @@ watch(
 const handleSave = () => emit('save', cvData.value)
 const handleBack = () => emit('back')
 
-/** ---------- Responsive tabs ---------- */
 type MobileTab = 'editor' | 'preview' | 'design'
 const mobileTab = ref<MobileTab>('preview')
 
@@ -80,7 +74,36 @@ const tabLabel = computed(() => {
   return { editor: 'Editor', preview: 'Preview', design: 'Design' }
 })
 
-/** ---------- Export JSON ---------- */
+const previewContainer = ref<HTMLElement | null>(null)
+const previewScale = ref(1)
+const previewHeight = ref(0)
+
+const updateScale = () => {
+  const container = previewContainer.value
+  const page = document.querySelector('.resume-page') as HTMLElement | null
+  if (!container || !page) return
+  const available = container.clientWidth - 32
+  const actualWidth = page.offsetWidth
+  const actualHeight = page.offsetHeight
+  const scale = available < actualWidth ? available / actualWidth : 1
+  previewScale.value = scale
+  previewHeight.value = actualHeight * scale
+}
+
+onMounted(() => {
+  updateScale()
+  window.addEventListener('resize', updateScale)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScale)
+})
+
+watch(mobileTab, async () => {
+  await nextTick()
+  updateScale()
+})
+
 const handleExportJSON = () => {
   const blob = new Blob([JSON.stringify(cvData.value, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
@@ -91,45 +114,27 @@ const handleExportJSON = () => {
   URL.revokeObjectURL(url)
 }
 
-/** ---------- PDF PERFECTO (sin popup, usando print del mismo documento) ---------- */
 const waitTwoFrames = async () => {
   await new Promise<void>((r) => requestAnimationFrame(() => r()))
   await new Promise<void>((r) => requestAnimationFrame(() => r()))
 }
 
 const waitFonts = async () => {
-  // @ts-ignore
-  if (document.fonts?.ready) {
-    // @ts-ignore
-    await document.fonts.ready
-  }
+  if (document.fonts?.ready) await document.fonts.ready
 }
 
 const ensurePrintStyles = () => {
   const id = 'pf-print-style'
   if (document.getElementById(id)) return
-
   const style = document.createElement('style')
   style.id = id
   style.textContent = `
 @media print {
-  @page { size: A4; margin: 0; } /* se ajusta dinámico en runtime con data-attr */
+  @page { size: A4; margin: 0; }
   html, body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-  /* ocultar toda la app */
   body > *:not(#pf-print-root) { display: none !important; }
-
-  /* mostrar solo el print root */
   #pf-print-root { display: block !important; }
-
-  /* hoja */
-  #pf-print-root .resume-page {
-    box-shadow: none !important;
-    margin: 0 auto !important;
-    transform: none !important;
-  }
-
-  /* evitar cortes feos en bloques */
+  #pf-print-root .resume-page { box-shadow: none !important; margin: 0 auto !important; transform: none !important; }
   header, section { break-inside: avoid; page-break-inside: avoid; }
   ul, li { break-inside: avoid; page-break-inside: avoid; }
 }
@@ -152,7 +157,6 @@ const handleExportPDF = async () => {
 
   ensurePrintStyles()
 
-  // root para impresión dentro del mismo documento (sin popup)
   let root = document.getElementById('pf-print-root') as HTMLDivElement | null
   if (!root) {
     root = document.createElement('div')
@@ -161,21 +165,18 @@ const handleExportPDF = async () => {
     document.body.appendChild(root)
   }
 
-  // limpiar e insertar clon
   root.innerHTML = ''
   const clone = pageEl.cloneNode(true) as HTMLElement
-  clone.removeAttribute('id') // evitar duplicados
+  clone.removeAttribute('id')
   clone.style.boxShadow = 'none'
   clone.style.transform = 'none'
   root.appendChild(clone)
 
-  // Ajustar tamaño de página según settings
   const isLetter = settings.value.paperSize === 'Letter'
   const pageSize = isLetter ? 'Letter' : 'A4'
   const pageWidth = isLetter ? '216mm' : '210mm'
   const pageHeight = isLetter ? '279mm' : '297mm'
 
-  // Inyectar estilo runtime para asegurar 1:1
   const runtimeId = 'pf-print-runtime-style'
   const existing = document.getElementById(runtimeId)
   if (existing) existing.remove()
@@ -189,20 +190,15 @@ const handleExportPDF = async () => {
     width: ${pageWidth} !important;
     min-height: ${pageHeight} !important;
     background: ${settings.value.pageBackground || '#ffffff'} !important;
-
     font-family: ${settings.value.fontFamily} !important;
     font-size: ${settings.value.fontSize}pt !important;
     line-height: ${settings.value.lineSpacing} !important;
-
     padding-top: ${settings.value.marginTop}px !important;
     padding-right: ${settings.value.marginRight}px !important;
     padding-bottom: ${settings.value.marginBottom}px !important;
     padding-left: ${settings.value.marginLeft}px !important;
-
     box-sizing: border-box !important;
   }
-
-  /* Colores de títulos */
   #pf-print-root .section-title {
     color: ${settings.value.themeColor} !important;
     border-bottom-color: ${settings.value.themeColor} !important;
@@ -217,25 +213,14 @@ const handleExportPDF = async () => {
   await waitFonts()
   await waitTwoFrames()
 
-  // mostrar root solo para imprimir
   root.style.display = 'block'
 
-  const cleanup = () => {
-    root!.style.display = 'none'
-    // no borramos el root, solo lo ocultamos para siguientes exports
-  }
-
-  // algunos navegadores soportan afterprint
+  const cleanup = () => { root!.style.display = 'none' }
   window.addEventListener('afterprint', cleanup, { once: true })
-
-  // disparar impresión (user: Guardar como PDF)
   window.print()
-
-  // fallback: si afterprint no corre, ocultar luego de un rato
   setTimeout(() => cleanup(), 1500)
 }
 
-/** ---------- Import ---------- */
 const handleImportFile = async (file: File) => {
   if (!file) return
   const ext = file.name.split('.').pop()?.toLowerCase()
@@ -249,12 +234,9 @@ const handleImportFile = async (file: File) => {
         if (!cvData.value.fileName) cvData.value.fileName = file.name.replace(/\.json$/i, '')
         if (!cvData.value.meta) cvData.value.meta = {}
         if (!cvData.value.meta.settings) cvData.value.meta.settings = { ...defaultSettings }
-
         syncingFromCv = true
         settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
-        queueMicrotask(() => {
-          syncingFromCv = false
-        })
+        queueMicrotask(() => { syncingFromCv = false })
       } catch {
         alert(props.currentLang === 'es' ? 'JSON inválido' : 'Invalid JSON')
       }
@@ -283,7 +265,6 @@ const handleImportFile = async (file: File) => {
     reader.onload = async () => {
       try {
         const typedarray = new Uint8Array(reader.result as ArrayBuffer)
-        // @ts-ignore
         const pdf = await pdfjsLib.getDocument(typedarray).promise
         let fullText = ''
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -312,35 +293,23 @@ const handleImportFile = async (file: File) => {
         <button
           type="button"
           class="px-3 py-2 rounded text-xs font-semibold border"
-          :class="mobileTab === 'editor'
-            ? 'bg-blue-600 text-white border-blue-600'
-            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
+          :class="mobileTab === 'editor' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
           @click="mobileTab = 'editor'"
-        >
-          {{ tabLabel.editor }}
-        </button>
+        >{{ tabLabel.editor }}</button>
 
         <button
           type="button"
           class="px-3 py-2 rounded text-xs font-semibold border"
-          :class="mobileTab === 'preview'
-            ? 'bg-blue-600 text-white border-blue-600'
-            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
+          :class="mobileTab === 'preview' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
           @click="mobileTab = 'preview'"
-        >
-          {{ tabLabel.preview }}
-        </button>
+        >{{ tabLabel.preview }}</button>
 
         <button
           type="button"
           class="px-3 py-2 rounded text-xs font-semibold border"
-          :class="mobileTab === 'design'
-            ? 'bg-blue-600 text-white border-blue-600'
-            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
+          :class="mobileTab === 'design' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
           @click="mobileTab = 'design'"
-        >
-          {{ tabLabel.design }}
-        </button>
+        >{{ tabLabel.design }}</button>
       </div>
     </div>
 
@@ -350,11 +319,19 @@ const handleImportFile = async (file: File) => {
       </div>
 
       <div
+        ref="previewContainer"
         class="flex-1 flex justify-center p-3 sm:p-4 overflow-y-auto bg-gray-200 dark:bg-gray-900/40"
         :class="mobileTab === 'preview' ? 'block' : 'hidden lg:flex'"
       >
         <div class="w-full flex justify-center">
-          <div class="transform lg:scale-100 scale-[0.92] sm:scale-100 origin-top">
+          <div
+            class="origin-top transition-transform duration-200"
+            :style="{
+              transform: `scale(${previewScale})`,
+              transformOrigin: 'top center',
+              height: previewHeight > 0 ? `${previewHeight}px` : 'auto'
+            }"
+          >
             <ResumePreview :cv-data="cvData" :settings="settings" :current-lang="currentLang" :export-mode="true" />
           </div>
         </div>

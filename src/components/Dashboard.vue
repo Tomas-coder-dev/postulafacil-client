@@ -33,7 +33,7 @@ const thumbnailSettings = {
 
 const printingIndex = ref<number | null>(null)
 
-const t = (key: string, lang: 'es' | 'en') => translations[lang]?.[key] || key
+const t = (key: string, lang: 'es' | 'en') => (translations[lang] as Record<string, string>)?.[key] || key
 
 const triggerImport = () => {
   document.getElementById('dashboard-file-upload')?.click()

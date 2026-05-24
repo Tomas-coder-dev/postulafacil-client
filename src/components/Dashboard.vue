@@ -1,10 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Copy, Trash2, FileText, Upload, Download } from 'lucide-vue-next'
 import ResumePreview from './ResumePreview.vue'
 import { translations } from '../utils/translations'
-
-// @ts-ignore
-import html2pdf from 'html2pdf.js'
 
 const props = defineProps<{
   cvList: any[]
@@ -33,7 +31,8 @@ const thumbnailSettings = {
   pageBackground: '#ffffff'
 }
 
-// @ts-ignore
+const printingIndex = ref<number | null>(null)
+
 const t = (key: string, lang: 'es' | 'en') => translations[lang]?.[key] || key
 
 const triggerImport = () => {
@@ -70,51 +69,120 @@ const exportCvJson = (cv: any) => {
   const dataStr = JSON.stringify(cv, null, 2)
   const blob = new Blob([dataStr], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
-
   const a = document.createElement('a')
   a.href = url
   a.download = `${(cv.fileName || 'CV_Export').replace(/\s+/g, '_')}.json`
   a.click()
-
   URL.revokeObjectURL(url)
 }
 
-const exportCvPdf = async (cv: any) => {
-  const temp = document.createElement('div')
-  temp.style.background = '#ffffff'
-  temp.style.padding = '0'
-  temp.style.margin = '0'
+const exportCvPdf = async (cv: any, index: number) => {
+  const cvSettings = cv.meta?.settings ?? thumbnailSettings
 
-  temp.innerHTML = `
-    <div style="width:210mm; min-height:297mm; background:#fff; padding:20mm; font-family: Times New Roman, serif;">
-      <h1 style="text-align:center; font-size:24pt; margin:0;">${cv.name || ''}</h1>
-      <p style="text-align:center; margin:6px 0 16px 0;">
-        ${(cv.email || '')}${cv.phone ? ' | ' + cv.phone : ''}
-      </p>
-      <p style="white-space:pre-line;">${cv.summary || ''}</p>
-    </div>
-  `
+  // Mostrar el ResumePreview a tamaño real temporalmente para capturarlo
+  printingIndex.value = index
 
-  const opt = {
-    margin: 0,
-    filename: `${(cv.fileName || 'CV').replace(/\s+/g, '_')}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  await new Promise(r => setTimeout(r, 300))
+
+  const pageEl = document.querySelector<HTMLElement>(`#print-source-${index} .resume-page`)
+
+  if (!pageEl) {
+    printingIndex.value = null
+    alert(props.currentLang === 'es' ? 'No se pudo generar el PDF.' : 'Could not generate PDF.')
+    return
   }
 
-  // @ts-ignore
-  await html2pdf().set(opt).from(temp).save()
+  // Reutilizar el mismo mecanismo que el editor
+  const id = 'pf-print-style'
+  if (!document.getElementById(id)) {
+    const style = document.createElement('style')
+    style.id = id
+    style.textContent = `
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body > *:not(#pf-print-root) { display: none !important; }
+  #pf-print-root { display: block !important; }
+  #pf-print-root .resume-page { box-shadow: none !important; margin: 0 auto !important; transform: none !important; }
+  header, section, ul, li { break-inside: avoid; page-break-inside: avoid; }
+}
+`
+    document.head.appendChild(style)
+  }
+
+  let root = document.getElementById('pf-print-root') as HTMLDivElement | null
+  if (!root) {
+    root = document.createElement('div')
+    root.id = 'pf-print-root'
+    root.style.display = 'none'
+    document.body.appendChild(root)
+  }
+
+  root.innerHTML = ''
+  const clone = pageEl.cloneNode(true) as HTMLElement
+  clone.removeAttribute('id')
+  clone.style.boxShadow = 'none'
+  clone.style.transform = 'none'
+  root.appendChild(clone)
+
+  const isLetter = cvSettings.paperSize === 'Letter'
+  const pageSize = isLetter ? 'Letter' : 'A4'
+  const pageWidth = isLetter ? '216mm' : '210mm'
+  const pageHeight = isLetter ? '279mm' : '297mm'
+
+  const runtimeId = 'pf-print-runtime-style'
+  const existing = document.getElementById(runtimeId)
+  if (existing) existing.remove()
+
+  const runtime = document.createElement('style')
+  runtime.id = runtimeId
+  runtime.textContent = `
+@media print {
+  @page { size: ${pageSize}; margin: 0; }
+  #pf-print-root .resume-page {
+    width: ${pageWidth} !important;
+    min-height: ${pageHeight} !important;
+    background: ${cvSettings.pageBackground || '#ffffff'} !important;
+    font-family: ${cvSettings.fontFamily} !important;
+    font-size: ${cvSettings.fontSize}pt !important;
+    line-height: ${cvSettings.lineSpacing} !important;
+    padding-top: ${cvSettings.marginTop}px !important;
+    padding-right: ${cvSettings.marginRight}px !important;
+    padding-bottom: ${cvSettings.marginBottom}px !important;
+    padding-left: ${cvSettings.marginLeft}px !important;
+    box-sizing: border-box !important;
+  }
+  #pf-print-root .section-title {
+    color: ${cvSettings.themeColor} !important;
+    border-bottom-color: ${cvSettings.themeColor} !important;
+  }
+  #pf-print-root header {
+    border-bottom-color: ${cvSettings.themeColor} !important;
+  }
+}
+`
+  document.head.appendChild(runtime)
+
+  root.style.display = 'block'
+
+  const cleanup = () => {
+    root!.style.display = 'none'
+    printingIndex.value = null
+  }
+
+  window.addEventListener('afterprint', cleanup, { once: true })
+  window.print()
+  setTimeout(() => cleanup(), 1500)
 }
 
-const handleDownload = async (cv: any) => {
+const handleDownload = async (cv: any, index: number) => {
   const isPdf = confirm(
     props.currentLang === 'es'
       ? '¿Descargar PDF?\n(Aceptar = PDF | Cancelar = JSON)'
       : 'Download PDF?\n(OK = PDF | Cancel = JSON)'
   )
 
-  if (isPdf) await exportCvPdf(cv)
+  if (isPdf) await exportCvPdf(cv, index)
   else exportCvJson(cv)
 }
 </script>
@@ -169,6 +237,20 @@ const handleDownload = async (cv: any) => {
         :key="index"
         class="group relative bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 flex flex-col min-h-[420px]"
       >
+        <!-- ResumePreview a tamaño real, oculto, para capturar al imprimir -->
+        <div
+          :id="`print-source-${index}`"
+          class="fixed left-[-9999px] top-0 pointer-events-none"
+          :style="printingIndex === index ? 'opacity:1' : 'opacity:0'"
+        >
+          <ResumePreview
+            :cv-data="cv"
+            :settings="cv.meta?.settings ?? thumbnailSettings"
+            :current-lang="currentLang"
+            :export-mode="false"
+          />
+        </div>
+
         <div
           class="relative flex-1 overflow-hidden bg-gray-200 dark:bg-gray-800 cursor-pointer"
           @click="emit('editCv', index)"
@@ -201,7 +283,7 @@ const handleDownload = async (cv: any) => {
 
           <div class="flex items-center gap-1">
             <button
-              @click.stop="handleDownload(cv)"
+              @click.stop="handleDownload(cv, index)"
               class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition"
               :title="currentLang === 'es' ? 'Descargar (PDF o JSON)' : 'Download (PDF or JSON)'"
               type="button"

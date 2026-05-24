@@ -35,8 +35,68 @@ const defaultSettings = {
 
 const cvData = ref<any>({})
 const settings = ref({ ...defaultSettings })
+const hasUnsavedChanges = ref(false)
+const lastSavedSnapshot = ref('')
+const undoStack = ref<string[]>([])
+const redoStack = ref<string[]>([])
+const MAX_HISTORY = 50
 
 let syncingFromCv = false
+let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+
+const snapshot = () => JSON.stringify({ cvData: cvData.value, settings: settings.value })
+
+const pushUndo = () => {
+  const current = snapshot()
+  if (undoStack.value[undoStack.value.length - 1] === current) return
+  undoStack.value.push(current)
+  if (undoStack.value.length > MAX_HISTORY) undoStack.value.shift()
+  redoStack.value = []
+}
+
+const undo = () => {
+  if (undoStack.value.length === 0) return
+  const current = snapshot()
+  redoStack.value.push(current)
+  const prev = undoStack.value.pop()!
+  const parsed = JSON.parse(prev)
+  syncingFromCv = true
+  cvData.value = parsed.cvData
+  settings.value = parsed.settings
+  queueMicrotask(() => { syncingFromCv = false })
+}
+
+const redo = () => {
+  if (redoStack.value.length === 0) return
+  const current = snapshot()
+  undoStack.value.push(current)
+  const next = redoStack.value.pop()!
+  const parsed = JSON.parse(next)
+  syncingFromCv = true
+  cvData.value = parsed.cvData
+  settings.value = parsed.settings
+  queueMicrotask(() => { syncingFromCv = false })
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+    e.preventDefault()
+    undo()
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+    e.preventDefault()
+    redo()
+  }
+}
+
+const scheduleAutoSave = () => {
+  if (autoSaveTimer) clearTimeout(autoSaveTimer)
+  autoSaveTimer = setTimeout(() => {
+    emit('save', cvData.value)
+    lastSavedSnapshot.value = snapshot()
+    hasUnsavedChanges.value = false
+  }, 5000)
+}
 
 watch(
   () => props.initialData,
@@ -48,6 +108,10 @@ watch(
     syncingFromCv = true
     settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
     queueMicrotask(() => { syncingFromCv = false })
+    lastSavedSnapshot.value = snapshot()
+    hasUnsavedChanges.value = false
+    undoStack.value = []
+    redoStack.value = []
   },
   { immediate: true }
 )
@@ -63,7 +127,27 @@ watch(
   { deep: true }
 )
 
-const handleSave = () => emit('save', cvData.value)
+watch(
+  [cvData, settings],
+  () => {
+    if (syncingFromCv) return
+    const current = snapshot()
+    if (current !== lastSavedSnapshot.value) {
+      hasUnsavedChanges.value = true
+      pushUndo()
+      scheduleAutoSave()
+    }
+  },
+  { deep: true }
+)
+
+const handleSave = () => {
+  if (autoSaveTimer) clearTimeout(autoSaveTimer)
+  emit('save', cvData.value)
+  lastSavedSnapshot.value = snapshot()
+  hasUnsavedChanges.value = false
+}
+
 const handleBack = () => emit('back')
 
 type MobileTab = 'editor' | 'preview' | 'design'
@@ -93,10 +177,13 @@ const updateScale = () => {
 onMounted(() => {
   updateScale()
   window.addEventListener('resize', updateScale)
+  window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale)
+  window.removeEventListener('keydown', handleKeydown)
+  if (autoSaveTimer) clearTimeout(autoSaveTimer)
 })
 
 watch(mobileTab, async () => {
@@ -288,6 +375,14 @@ const handleImportFile = async (file: File) => {
 
 <template>
   <div class="bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
+
+    <div v-if="hasUnsavedChanges" class="print:hidden bg-amber-500 text-white text-xs text-center py-1 px-4 flex items-center justify-center gap-2">
+      <span>{{ props.currentLang === 'es' ? 'Cambios sin guardar — guardando automáticamente...' : 'Unsaved changes — autosaving...' }}</span>
+      <button @click="handleSave" class="underline font-bold hover:text-amber-100 transition" type="button">
+        {{ props.currentLang === 'es' ? 'Guardar ahora' : 'Save now' }}
+      </button>
+    </div>
+
     <div class="lg:hidden sticky top-0 z-20 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-3 py-2 print:hidden">
       <div class="grid grid-cols-3 gap-2">
         <button

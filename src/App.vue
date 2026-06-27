@@ -33,7 +33,7 @@ const fabricioCV = {
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
   summary:
-    'Egresado de Diseño y Desarrollo de Software (TECSUP), con experiencia en desarrollo Full Stack adquirida mediante proyectos académicos, experiencia profesional y desarrollo de soluciones empresariales. Participación en el diseño y construcción de aplicaciones web y móviles, implementación de APIs, integración de bases de datos y desarrollo de funcionalidades orientadas a mejorar procesos y experiencia de usuario. Interesado en crear soluciones escalables, mantenibles y enfocadas en calidad mediante aprendizaje continuo y trabajo colaborativo.',
+    'Egresado de Diseño y Desarrollo de Software (TECSUP), con experiencia en desarrollo Full Stack mediante proyectos empresariales y construcción de soluciones web y móviles. Experiencia en desarrollo de APIs REST, integración de bases de datos, aplicaciones móviles y servicios externos. Enfocado en crear soluciones escalables, mantenibles y orientadas a mejorar procesos mediante buenas prácticas de desarrollo.',
   experience: [
     {
       company: 'CIMARK.PE',
@@ -49,7 +49,7 @@ const fabricioCV = {
     },
     {
       company: 'TECSUP',
-      role: 'Desarrollador FullStack',
+      role: 'Desarrollador Full Stack',
       date: 'May 2025 - Sept 2025',
       location: 'Lima, Peru',
       description: [
@@ -77,14 +77,14 @@ const fabricioCV = {
   ],
   projects: [
     {
-      name: 'TecLunch',
-      description: 'Sistema de Reservas de Comedor. Desarrollo de aplicación web y móvil para gestión de reservas y pagos.',
-      tech: 'React, Django, Spring Boot, MySQL, Kotlin (móvil)'
-    },
-    {
       name: 'ULenguage — Aplicación móvil inteligente de traducción cultural Quechua',
       description: 'Aplicación móvil orientada a turistas en Cusco para traducción quechua-español-inglés. Permite reconocer texto mediante imágenes, realizar traducciones automáticas y generar explicaciones culturales utilizando inteligencia artificial. Desarrollo de solución completa incluyendo aplicación móvil, backend, APIs y gestión de datos.',
       tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, Swagger'
+    },
+    {
+      name: 'SaveBot — Plataforma de respaldo multimedia mediante Telegram',
+      description: 'Aplicación web integrada con un bot de Telegram para automatizar el respaldo y envío de imágenes. Permite cargar archivos desde una plataforma web y gestionar su distribución mediante integración con Telegram Bot API.',
+      tech: 'JavaScript, Node.js, Telegram Bot API, APIs REST, HTML, CSS, Git'
     },
     {
       name: 'PostulaFácil — Plataforma Inteligente para Creación y Gestión de CVs',
@@ -92,9 +92,9 @@ const fabricioCV = {
       tech: 'Vue.js 3, TypeScript, Composition API, TailwindCSS, JSON, PDF Export'
     },
     {
-      name: 'SaveBot — Plataforma de respaldo multimedia mediante Telegram',
-      description: 'Aplicación web integrada con un bot de Telegram para automatizar el respaldo y envío de imágenes. Permite cargar archivos desde una plataforma web y gestionar su distribución mediante integración con Telegram Bot API.',
-      tech: 'JavaScript, Node.js, Telegram Bot API, APIs REST, HTML, CSS, Git'
+      name: 'TecLunch',
+      description: 'Sistema de Reservas de Comedor. Desarrollo de aplicación web y móvil para gestión de reservas y pagos.',
+      tech: 'React, Django, Spring Boot, MySQL, Kotlin (móvil)'
     }
   ],
   education: [
@@ -111,9 +111,10 @@ const fabricioCV = {
     frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
     backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, APIs REST, JWT, Swagger',
     db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
-    tools: 'Linux, Git, GitHub',
-    languages: 'Español (Nativo), Inglés (Intermedio B1–B2)',
-    mobile: 'Flutter, Dart, Kotlin'
+    mobile: 'Flutter, Dart, Kotlin',
+    tools: 'Linux, Git, GitHub, Postman, Swagger',
+    cloudAi: 'Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
+    languages: 'Español (Nativo), Inglés (Intermedio B1–B2)'
   },
   fileName: 'CV_Principal_Fabricio',
   meta: { settings: { ...defaultSettings } }
@@ -172,12 +173,14 @@ const normalizeCv = (cv: any) => {
   const s = cv.skills
   const invalidSkills = !s || typeof s !== 'object' || Array.isArray(s)
   if (invalidSkills) {
-    cv.skills = { frontend: '', backend: '', db: '', tools: '', languages: '' }
+    cv.skills = { frontend: '', backend: '', db: '', mobile: '', tools: '', cloudAi: '', languages: '' }
   } else {
     cv.skills.frontend ??= ''
     cv.skills.backend ??= ''
     cv.skills.db ??= ''
+    cv.skills.mobile ??= ''
     cv.skills.tools ??= ''
+    cv.skills.cloudAi ??= ''
     cv.skills.languages ??= ''
     if ('other' in cv.skills) delete cv.skills.other
   }

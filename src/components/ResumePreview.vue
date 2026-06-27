@@ -35,6 +35,25 @@ const pageStyle = computed<Record<string, string | number>>(() => {
 
 const contentId = computed(() => (props.exportMode ? 'resume-preview-content' : undefined))
 
+const fixedSkillLabelKeys: Record<string, string> = {
+  frontend: 'skillsFrontend',
+  backend: 'skillsBackend',
+  db: 'skillsDB',
+  mobile: 'skillsMobile',
+  tools: 'skillsTools',
+  cloudAi: 'skillsCloudAi',
+  languages: 'skillsLanguages'
+}
+
+const formatSkillLabel = (key: string) => {
+  const translationKey = fixedSkillLabelKeys[key]
+  if (translationKey) return t(translationKey)
+  return key
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 const skillsEntries = computed(() => {
   const s = props.cvData?.skills
   if (!s || typeof s !== 'object' || Array.isArray(s)) return []
@@ -118,7 +137,7 @@ const skillsEntries = computed(() => {
         <section v-if="skillsEntries.length" class="section-block">
           <h2 class="section-title">{{ t('cv_skillsTitle') || 'Skills adicionales' }}</h2>
           <p v-for="([key, val], idx) in skillsEntries" :key="idx" class="mb-1">
-            <strong class="capitalize">{{ key }}:</strong> {{ val }}
+            <strong>{{ formatSkillLabel(key) }}:</strong> {{ val }}
           </p>
         </section>
       </div>

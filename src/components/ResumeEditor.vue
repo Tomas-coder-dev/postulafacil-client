@@ -94,7 +94,7 @@ const onDragEnd = () => {
   dragOver.value = null
 }
 
-const fixedSkillKeys = ['frontend', 'backend', 'db', 'tools', 'languages'] as const
+const fixedSkillKeys = ['frontend', 'backend', 'db', 'mobile', 'tools', 'cloudAi', 'languages'] as const
 
 const ensureSkillsObject = () => {
   const cv = cvDataLocal.value
@@ -106,7 +106,9 @@ const ensureSkillsObject = () => {
   base.frontend ??= ''
   base.backend ??= ''
   base.db ??= ''
+  base.mobile ??= ''
   base.tools ??= ''
+  base.cloudAi ??= ''
   base.languages ??= ''
   cvDataLocal.value = { ...cv, skills: base }
 }
@@ -400,8 +402,16 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
             <input v-model="cvDataLocal.skills.db" class="input-field" />
           </div>
           <div>
+            <label class="label">{{ t('skillsMobile') }}</label>
+            <input v-model="cvDataLocal.skills.mobile" class="input-field" />
+          </div>
+          <div>
             <label class="label">{{ t('skillsTools') }}</label>
             <input v-model="cvDataLocal.skills.tools" class="input-field" />
+          </div>
+          <div>
+            <label class="label">{{ t('skillsCloudAi') }}</label>
+            <input v-model="cvDataLocal.skills.cloudAi" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsLanguages') }}</label>

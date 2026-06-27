@@ -83,8 +83,10 @@ export const translations = {
     // Skills fijos
     skillsFrontend: 'Frontend',
     skillsBackend: 'Backend',
-    skillsDB: 'Base de datos',
+    skillsDB: 'Bases de Datos',
+    skillsMobile: 'Mobile',
     skillsTools: 'Herramientas',
+    skillsCloudAi: 'Cloud & IA',
     skillsLanguages: 'Idiomas',
     skillsOther: 'Otros'
   },
@@ -173,7 +175,9 @@ export const translations = {
     skillsFrontend: 'Frontend',
     skillsBackend: 'Backend',
     skillsDB: 'Database',
+    skillsMobile: 'Mobile',
     skillsTools: 'Tools',
+    skillsCloudAi: 'Cloud & AI',
     skillsLanguages: 'Languages',
     skillsOther: 'Other'
   }

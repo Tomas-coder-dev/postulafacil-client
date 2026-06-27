@@ -68,7 +68,7 @@ const fabricioCV = {
         'Desarrollo y mantenimiento de funcionalidades para CRM empresarial.',
         'Implementación y consumo de APIs REST utilizando .NET.',
         'Desarrollo de interfaces y componentes frontend utilizando Angular.',
-        'Participación en desarrollo de funcionalidades móviles utilizando Flutter.',
+        'Apoyo puntual en funcionalidades móviles utilizando Flutter.',
         'Creación y mantenimiento de consultas y procedimientos en SQL Server.',
         'Corrección de incidencias y optimización de funcionalidades existentes.',
         'Trabajo colaborativo mediante Git y control de versiones.'

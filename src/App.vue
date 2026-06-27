@@ -33,7 +33,7 @@ const fabricioCV = {
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
   summary:
-    'Egresado de Diseño y Desarrollo de Software (TECSUP), con experiencia en desarrollo web y móvil full stack adquirida a través de proyectos aplicados, prácticas profesionales y hackathons. Interesado en la creación de soluciones tecnológicas eficientes, con enfoque en calidad, escalabilidad y trabajo colaborativo.\n\nBusco desarrollarme como Desarrollador Full Stack Junior, aportando compromiso, aprendizaje continuo y buenas prácticas de desarrollo.\n\nNivel de inglés: Intermedio (B1–B2).',
+    'Egresado de Diseño y Desarrollo de Software (TECSUP), con experiencia en desarrollo Full Stack adquirida mediante proyectos académicos, experiencia profesional y desarrollo de soluciones empresariales. Participación en el diseño y construcción de aplicaciones web y móviles, implementación de APIs, integración de bases de datos y desarrollo de funcionalidades orientadas a mejorar procesos y experiencia de usuario. Interesado en crear soluciones escalables, mantenibles y enfocadas en calidad mediante aprendizaje continuo y trabajo colaborativo.',
   experience: [
     {
       company: 'CIMARK.PE',
@@ -50,7 +50,7 @@ const fabricioCV = {
     {
       company: 'TECSUP',
       role: 'Desarrollador FullStack',
-      date: 'Mar 2025 - Abr 2025',
+      date: 'May 2025 - Sept 2025',
       location: 'Lima, Peru',
       description: [
         'Desarrollo de un sistema web de inventario químico para laboratorio académico.',
@@ -82,14 +82,19 @@ const fabricioCV = {
       tech: 'React, Django, Spring Boot, MySQL, Kotlin (móvil)'
     },
     {
-      name: 'Mejora de Plataforma Web CEDITEC',
-      description: 'Rediseño de la interfaz UX/UI y optimización de funcionalidades de la biblioteca digital.',
-      tech: 'Laravel, MySQL, TailwindCSS'
+      name: 'ULenguage — Aplicación móvil inteligente de traducción cultural Quechua',
+      description: 'Aplicación móvil orientada a turistas en Cusco para traducción quechua-español-inglés. Permite reconocer texto mediante imágenes, realizar traducciones automáticas y generar explicaciones culturales utilizando inteligencia artificial. Desarrollo de solución completa incluyendo aplicación móvil, backend, APIs y gestión de datos.',
+      tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, Swagger'
     },
     {
       name: 'PostulaFácil — Plataforma Inteligente para Creación y Gestión de CVs',
       description: 'Aplicación web para creación, edición y administración de currículums con enfoque en privacidad y personalización.',
       tech: 'Vue.js 3, TypeScript, Composition API, TailwindCSS, JSON, PDF Export'
+    },
+    {
+      name: 'SaveBot — Plataforma de respaldo multimedia mediante Telegram',
+      description: 'Aplicación web integrada con un bot de Telegram para automatizar el respaldo y envío de imágenes. Permite cargar archivos desde una plataforma web y gestionar su distribución mediante integración con Telegram Bot API.',
+      tech: 'JavaScript, Node.js, Telegram Bot API, APIs REST, HTML, CSS, Git'
     }
   ],
   education: [
@@ -103,11 +108,12 @@ const fabricioCV = {
     'Training Camp CPC – UTEC'
   ],
   skills: {
-    frontend: 'HTML, CSS, Bootstrap, JavaScript, React, Angular, Next.js',
-    backend: 'Node.js, PHP, C#, .NET, Laravel',
-    db: 'MySQL, PostgreSQL, SQL Server, MongoDB',
+    frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
+    backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, APIs REST, JWT, Swagger',
+    db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
     tools: 'Linux, Git, GitHub',
-    languages: 'Español (Nativo), Inglés (Intermedio B1–B2)'
+    languages: 'Español (Nativo), Inglés (Intermedio B1–B2)',
+    mobile: 'Flutter, Dart, Kotlin'
   },
   fileName: 'CV_Principal_Fabricio',
   meta: { settings: { ...defaultSettings } }
@@ -152,7 +158,7 @@ const normalizeCv = (cv: any) => {
     const d = j?.description
     const descArr =
       Array.isArray(d) ? d :
-      typeof d === 'string' && d.trim() ? d.split('\n').map((x) => x.trim()).filter(Boolean) :
+      typeof d === 'string' && d.trim() ? d.split('\n').map((x: string) => x.trim()).filter(Boolean) :
       []
     return {
       company: j?.company ?? '',

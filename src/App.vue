@@ -33,20 +33,21 @@ const fabricioCV = {
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
   summary:
-    'Desarrollador Full Stack con sólida base técnica, egresado de TECSUP y actual estudiante de Ingeniería de Software en la USIL. Poseo experiencia comprobada en el ciclo completo de desarrollo de aplicaciones web y móviles empresariales, utilizando tecnologías como Vue.js, Angular, .NET, PHP (Laravel) y Flutter. Me especializo en la creación de soluciones escalables, integración de APIs REST, arquitectura de bases de datos y desarrollo de interfaces UI/UX responsivas. Acostumbrado a trabajar bajo metodologías ágiles (Scrum) y enfocado en entregar código limpio, mantenible y alineado con las mejores prácticas de la industria.',
+    'Egresado de Diseño y Desarrollo de Software (TECSUP), con experiencia en desarrollo Full Stack mediante proyectos empresariales y construcción de soluciones web y móviles. Experiencia en desarrollo de APIs REST, integración de bases de datos, aplicaciones móviles y servicios externos. Enfocado en crear soluciones escalables, mantenibles y orientadas a mejorar procesos mediante buenas prácticas de desarrollo.',
   experience: [
     {
-      company: 'Firefly One',
+      company: 'Syncra Connect — CRM Empresarial (Proyecto Unilene)',
       role: 'Desarrollador Full Stack',
-      date: 'Julio 2026 - Actualidad',
+      date: 'Feb 2026 - Jun 2026',
       location: 'Lima, Peru',
       description: [
-        'Diseño, desarrollo y mantenimiento continuo de aplicaciones web empresariales utilizando Vue.js para el frontend y PHP/Laravel en el backend.',
-        'Implementación de nuevas características, refactorización de módulos existentes y resolución ágil de incidencias para asegurar la estabilidad del sistema.',
-        'Consumo e integración fluida de APIs RESTful, además del diseño, mantenimiento y optimización de bases de datos relacionales.',
-        'Manejo avanzado de repositorios, resolución de conflictos de código y trabajo eficiente con múltiples ramas de desarrollo concurrentes.',
-        'Mejora continua de interfaces responsivas para elevar la experiencia del usuario, respaldada por la ejecución de pruebas funcionales.',
-        'Trabajo colaborativo bajo el marco Scrum, gestionando el ciclo de vida del desarrollo en Jira y utilizando Docker y servicios Cloud.'
+        'Desarrollo y mantenimiento de funcionalidades para CRM empresarial.',
+        'Implementación y consumo de APIs REST utilizando .NET.',
+        'Desarrollo de interfaces y componentes frontend utilizando Angular.',
+        'Participación en desarrollo de funcionalidades móviles utilizando Flutter.',
+        'Creación y mantenimiento de consultas y procedimientos en SQL Server.',
+        'Corrección de incidencias y optimización de funcionalidades existentes.',
+        'Trabajo colaborativo mediante Git y control de versiones.'
       ]
     },
     {
@@ -72,21 +73,6 @@ const fabricioCV = {
         'Desarrollo de funcionalidades CRUD, reportes automatizados y control de inventarios.',
         'Trabajo bajo metodología ágil y elaboración de documentación técnica del sistema.'
       ]
-    },
-    {
-      company: 'Syncra Connect (Proyecto CRM – Unilene)',
-      role: 'Desarrollador Full Stack',
-      date: 'Feb 2026 – Jun 2026',
-      location: 'Lima, Peru',
-      description: [
-        'Desarrollo y mantenimiento de funcionalidades para CRM empresarial.',
-        'Implementación y consumo de APIs REST utilizando .NET.',
-        'Desarrollo de interfaces y componentes frontend utilizando Angular.',
-        'Apoyo puntual en funcionalidades móviles utilizando Flutter.',
-        'Creación y mantenimiento de consultas y procedimientos en SQL Server.',
-        'Corrección de incidencias y optimización de funcionalidades existentes.',
-        'Trabajo colaborativo mediante Git y control de versiones.'
-      ]
     }
   ],
   projects: [
@@ -104,11 +90,6 @@ const fabricioCV = {
       name: 'PostulaFácil — Plataforma Inteligente para Creación y Gestión de CVs',
       description: 'Aplicación web para creación, edición y administración de currículums con enfoque en privacidad y personalización.',
       tech: 'Vue.js 3, TypeScript, Composition API, TailwindCSS, JSON, PDF Export'
-    },
-    {
-      name: 'TecLunch',
-      description: 'Sistema de Reservas de Comedor. Desarrollo de aplicación web y móvil para gestión de reservas y pagos.',
-      tech: 'React, Django, Spring Boot, MySQL, Kotlin (móvil)'
     }
   ],
   education: [
@@ -122,13 +103,13 @@ const fabricioCV = {
     'Training Camp CPC – UTEC'
   ],
   skills: {
-    frontend: 'Responsive Web Design, Diseño de Interfaces (UI/UX), HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
-    backend: 'Desarrollo Full Stack, Desarrollo Web Empresarial, Desarrollo de APIs REST, Arquitectura MVC, Node.js, Express.js, PHP, C#, .NET, Laravel, JWT, Swagger',
-    db: 'Optimización de Consultas SQL, Integración de Sistemas, MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
-    mobile: 'Aplicaciones Multiplataforma, Flutter, Dart, Kotlin',
-    tools: 'Git Flow y Resolución de Conflictos, Docker, Servicios Cloud, Scrum, Jira, Pruebas Funcionales, Trabajo Colaborativo, Linux, Git, GitHub, Postman',
+    frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
+    backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, APIs REST, JWT, Swagger',
+    db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
+    mobile: 'Flutter, Dart, Kotlin',
+    tools: 'Linux, Git, GitHub, Postman, Swagger',
     cloudAi: 'Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
-    languages: 'Español (Nativo), Inglés (Intermedio B1–B2)'
+    languages: ''
   },
   fileName: 'CV_Principal_Fabricio',
   meta: { settings: { ...defaultSettings } }

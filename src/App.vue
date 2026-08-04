@@ -259,7 +259,6 @@ const saveCV = (updatedData: any) => {
   if (selectedCvIndex.value !== null) {
     cvList.value[selectedCvIndex.value] = normalizeCv(updatedData)
     saveToLocal()
-    alert(currentLang.value === 'es' ? 'Guardado correctamente' : 'Saved')
   }
 }
 

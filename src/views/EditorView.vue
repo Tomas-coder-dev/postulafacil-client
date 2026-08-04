@@ -95,7 +95,7 @@ const scheduleAutoSave = () => {
     emit('save', cvData.value)
     lastSavedSnapshot.value = snapshot()
     hasUnsavedChanges.value = false
-  }, 5000)
+  }, 60000)
 }
 
 watch(

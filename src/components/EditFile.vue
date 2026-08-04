@@ -65,6 +65,30 @@ const handleImportChange = (e: Event) => {
 
 const themeColors = ['#000000', '#1F2937', '#0F766E', '#2563EB', '#7C2D12', '#B91C1C']
 const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7EB']
+
+const applyPreset = (type: 'classic' | 'modern' | 'creative') => {
+  const base = { ...props.settings }
+  if (type === 'classic') {
+    base.fontFamily = 'Times New Roman, serif'
+    base.themeColor = '#000000'
+    base.pageBackground = '#ffffff'
+    base.lineSpacing = 1.3
+    base.paragraphSpacing = 8
+  } else if (type === 'modern') {
+    base.fontFamily = 'Arial, sans-serif'
+    base.themeColor = '#2563EB'
+    base.pageBackground = '#F9FAFB'
+    base.lineSpacing = 1.5
+    base.paragraphSpacing = 10
+  } else if (type === 'creative') {
+    base.fontFamily = 'Garamond, serif'
+    base.themeColor = '#7C2D12'
+    base.pageBackground = '#FEF3C7'
+    base.lineSpacing = 1.4
+    base.paragraphSpacing = 12
+  }
+  emit('update:settings', base)
+}
 </script>
 
 <template>
@@ -102,6 +126,25 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
     <div class="p-5 space-y-6">
       <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
         <Palette :size="14" /> {{ props.currentLang === 'es' ? 'Diseño' : 'Design' }}
+      </div>
+
+      <!-- Estilos Predefinidos -->
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
+          <Palette :size="14" />
+          <span>{{ props.currentLang === 'es' ? 'Estilos Rápidos' : 'Quick Styles' }}</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button @click="applyPreset('classic')" class="preset-btn" type="button">
+            {{ props.currentLang === 'es' ? 'Clásico' : 'Classic' }}
+          </button>
+          <button @click="applyPreset('modern')" class="preset-btn" type="button">
+            {{ props.currentLang === 'es' ? 'Moderno' : 'Modern' }}
+          </button>
+          <button @click="applyPreset('creative')" class="preset-btn" type="button">
+            {{ props.currentLang === 'es' ? 'Creativo' : 'Creative' }}
+          </button>
+        </div>
       </div>
 
       <!-- Tamaño de página -->
@@ -255,6 +298,9 @@ const bgColors = ['#ffffff', '#F9FAFB', '#FEF3C7', '#E0F2FE', '#FCE7F3', '#E5E7E
 <style scoped>
 .btn-action {
   @apply w-full inline-flex items-center justify-center gap-2 px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-xs text-gray-700 dark:text-gray-200 transition border border-gray-200 dark:border-gray-600 font-semibold;
+}
+.preset-btn {
+  @apply text-[10px] font-bold uppercase py-1.5 px-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition text-center;
 }
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }

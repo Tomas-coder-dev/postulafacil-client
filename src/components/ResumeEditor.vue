@@ -247,38 +247,40 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
           <h3 class="section-header !border-0 !mb-0">{{ t('experience') }}</h3>
           <button @click="addExperience" class="add-btn" type="button">+ {{ t('addExperience') }}</button>
         </div>
-        <div
-          v-for="(job, index) in (cvDataLocal.experience || [])"
-          :key="Number(index)"
-          class="card-item transition-opacity"
-          :class="{
-            'opacity-40': dragSection === 'experience' && dragFrom === Number(index),
-            'ring-2 ring-blue-400': dragSection === 'experience' && dragOver === Number(index) && dragFrom !== Number(index)
-          }"
-          draggable="true"
-          @dragstart="onDragStart('experience', Number(index))"
-          @dragover="onDragOver($event, Number(index))"
-          @drop="onDrop('experience')"
-          @dragend="onDragEnd"
-        >
-          <div class="flex items-start gap-2 mb-2">
-            <div class="flex flex-col items-center gap-0.5 pt-0.5">
-              <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
-              <button @click="moveExperience(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
-              <button @click="moveExperience(Number(index), 1)" :disabled="Number(index) === cvDataLocal.experience.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+        <TransitionGroup name="list" tag="div" class="flex flex-col gap-4 relative">
+          <div
+            v-for="(job, index) in (cvDataLocal.experience || [])"
+            :key="job"
+            class="card-item transition-all"
+            :class="{
+              'opacity-40': dragSection === 'experience' && dragFrom === Number(index),
+              'ring-2 ring-blue-400': dragSection === 'experience' && dragOver === Number(index) && dragFrom !== Number(index)
+            }"
+            draggable="true"
+            @dragstart="onDragStart('experience', Number(index))"
+            @dragover="onDragOver($event, Number(index))"
+            @drop="onDrop('experience')"
+            @dragend="onDragEnd"
+          >
+            <div class="flex items-start gap-2 mb-2">
+              <div class="flex flex-col items-center gap-0.5 pt-0.5">
+                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+                <button @click="moveExperience(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
+                <button @click="moveExperience(Number(index), 1)" :disabled="Number(index) === cvDataLocal.experience.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+              </div>
+              <input v-model="job.company" class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white placeholder-gray-400" :placeholder="t('companyPlaceholder')" />
+              <button @click="cvDataLocal.experience.splice(Number(index), 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
             </div>
-            <input v-model="job.company" class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white placeholder-gray-400" :placeholder="t('companyPlaceholder')" />
-            <button @click="cvDataLocal.experience.splice(Number(index), 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <input v-model="job.role" class="input-sm" :placeholder="t('rolePlaceholder')" />
+              <input v-model="job.date" class="input-sm" :placeholder="t('datePlaceholder')" />
+            </div>
+            <div class="grid grid-cols-1 gap-2 mb-2">
+              <input v-model="job.location" class="input-sm" :placeholder="t('jobLocationPlaceholder')" />
+            </div>
+            <textarea v-model="job.description" rows="3" class="input-sm w-full border rounded p-1 bg-white dark:bg-gray-900" :placeholder="t('jobDescriptionPlaceholder')"></textarea>
           </div>
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <input v-model="job.role" class="input-sm" :placeholder="t('rolePlaceholder')" />
-            <input v-model="job.date" class="input-sm" :placeholder="t('datePlaceholder')" />
-          </div>
-          <div class="grid grid-cols-1 gap-2 mb-2">
-            <input v-model="job.location" class="input-sm" :placeholder="t('jobLocationPlaceholder')" />
-          </div>
-          <textarea v-model="job.description" rows="3" class="input-sm w-full border rounded p-1 bg-white dark:bg-gray-900" :placeholder="t('jobDescriptionPlaceholder')"></textarea>
-        </div>
+        </TransitionGroup>
       </section>
 
       <section class="space-y-4">
@@ -286,32 +288,34 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
           <h3 class="section-header !border-0 !mb-0">{{ t('projects') }}</h3>
           <button @click="addProject" class="add-btn" type="button">+ {{ t('addProject') }}</button>
         </div>
-        <div
-          v-for="(proj, index) in (cvDataLocal.projects || [])"
-          :key="Number(index)"
-          class="card-item transition-opacity"
-          :class="{
-            'opacity-40': dragSection === 'projects' && dragFrom === Number(index),
-            'ring-2 ring-blue-400': dragSection === 'projects' && dragOver === Number(index) && dragFrom !== Number(index)
-          }"
-          draggable="true"
-          @dragstart="onDragStart('projects', Number(index))"
-          @dragover="onDragOver($event, Number(index))"
-          @drop="onDrop('projects')"
-          @dragend="onDragEnd"
-        >
-          <div class="flex items-start gap-2 mb-1">
-            <div class="flex flex-col items-center gap-0.5 pt-0.5">
-              <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
-              <button @click="moveProject(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
-              <button @click="moveProject(Number(index), 1)" :disabled="Number(index) === cvDataLocal.projects.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+        <TransitionGroup name="list" tag="div" class="flex flex-col gap-4 relative">
+          <div
+            v-for="(proj, index) in (cvDataLocal.projects || [])"
+            :key="proj"
+            class="card-item transition-all"
+            :class="{
+              'opacity-40': dragSection === 'projects' && dragFrom === Number(index),
+              'ring-2 ring-blue-400': dragSection === 'projects' && dragOver === Number(index) && dragFrom !== Number(index)
+            }"
+            draggable="true"
+            @dragstart="onDragStart('projects', Number(index))"
+            @dragover="onDragOver($event, Number(index))"
+            @drop="onDrop('projects')"
+            @dragend="onDragEnd"
+          >
+            <div class="flex items-start gap-2 mb-1">
+              <div class="flex flex-col items-center gap-0.5 pt-0.5">
+                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+                <button @click="moveProject(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
+                <button @click="moveProject(Number(index), 1)" :disabled="Number(index) === cvDataLocal.projects.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+              </div>
+              <input v-model="proj.name" class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white" :placeholder="t('projectNamePlaceholder')" />
+              <button @click="cvDataLocal.projects.splice(Number(index), 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
             </div>
-            <input v-model="proj.name" class="font-bold bg-transparent w-full outline-none text-gray-800 dark:text-white" :placeholder="t('projectNamePlaceholder')" />
-            <button @click="cvDataLocal.projects.splice(Number(index), 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
+            <textarea v-model="proj.description" rows="2" class="input-sm w-full mb-2 bg-white dark:bg-gray-900" :placeholder="t('projectDescriptionPlaceholder')"></textarea>
+            <input v-model="proj.tech" class="input-sm w-full" :placeholder="t('projectTechPlaceholder')" />
           </div>
-          <textarea v-model="proj.description" rows="2" class="input-sm w-full mb-2 bg-white dark:bg-gray-900" :placeholder="t('projectDescriptionPlaceholder')"></textarea>
-          <input v-model="proj.tech" class="input-sm w-full" :placeholder="t('projectTechPlaceholder')" />
-        </div>
+        </TransitionGroup>
       </section>
 
       <section class="space-y-4">
@@ -319,35 +323,37 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
           <h3 class="section-header !border-0 !mb-0">{{ t('education') }}</h3>
           <button @click="addEducation" class="add-btn" type="button">+ {{ t('addEducation') }}</button>
         </div>
-        <div
-          v-for="(edu, index) in (cvDataLocal.education || [])"
-          :key="Number(index)"
-          class="card-item transition-opacity"
-          :class="{
-            'opacity-40': dragSection === 'education' && dragFrom === Number(index),
-            'ring-2 ring-blue-400': dragSection === 'education' && dragOver === Number(index) && dragFrom !== Number(index)
-          }"
-          draggable="true"
-          @dragstart="onDragStart('education', Number(index))"
-          @dragover="onDragOver($event, Number(index))"
-          @drop="onDrop('education')"
-          @dragend="onDragEnd"
-        >
-          <div class="flex items-center gap-2 mb-2">
-            <div class="flex flex-col items-center gap-0.5">
-              <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
-              <button @click="moveEducation(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
-              <button @click="moveEducation(Number(index), 1)" :disabled="Number(index) === cvDataLocal.education.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+        <TransitionGroup name="list" tag="div" class="flex flex-col gap-4 relative">
+          <div
+            v-for="(edu, index) in (cvDataLocal.education || [])"
+            :key="edu"
+            class="card-item transition-all"
+            :class="{
+              'opacity-40': dragSection === 'education' && dragFrom === Number(index),
+              'ring-2 ring-blue-400': dragSection === 'education' && dragOver === Number(index) && dragFrom !== Number(index)
+            }"
+            draggable="true"
+            @dragstart="onDragStart('education', Number(index))"
+            @dragover="onDragOver($event, Number(index))"
+            @drop="onDrop('education')"
+            @dragend="onDragEnd"
+          >
+            <div class="flex items-center gap-2 mb-2">
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+                <button @click="moveEducation(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
+                <button @click="moveEducation(Number(index), 1)" :disabled="Number(index) === cvDataLocal.education.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+              </div>
+              <input v-model="edu.school" class="input-sm font-bold w-full" :placeholder="t('educationInstitutionPlaceholder')" />
+              <button @click="cvDataLocal.education.splice(Number(index), 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
             </div>
-            <input v-model="edu.school" class="input-sm font-bold w-full" :placeholder="t('educationInstitutionPlaceholder')" />
-            <button @click="cvDataLocal.education.splice(Number(index), 1)" class="del-btn" type="button"><Trash2 :size="14" /></button>
+            <div class="grid grid-cols-2 gap-2">
+              <input v-model="edu.degree" class="input-sm" :placeholder="t('educationDegreePlaceholder')" />
+              <input v-model="edu.date" class="input-sm" :placeholder="t('educationDatePlaceholder')" />
+              <input v-model="edu.location" class="input-sm col-span-2" :placeholder="t('educationLocationPlaceholder')" />
+            </div>
           </div>
-          <div class="grid grid-cols-2 gap-2">
-            <input v-model="edu.degree" class="input-sm" :placeholder="t('educationDegreePlaceholder')" />
-            <input v-model="edu.date" class="input-sm" :placeholder="t('educationDatePlaceholder')" />
-            <input v-model="edu.location" class="input-sm col-span-2" :placeholder="t('educationLocationPlaceholder')" />
-          </div>
-        </div>
+        </TransitionGroup>
       </section>
 
       <section class="space-y-4">
@@ -357,28 +363,30 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
             + {{ props.currentLang === 'es' ? 'Agregar certificación' : 'Add certification' }}
           </button>
         </div>
-        <div
-          v-for="(_, index) in (cvDataLocal.certifications || [])"
-          :key="Number(index)"
-          class="flex gap-2 items-center transition-opacity"
-          :class="{
-            'opacity-40': dragSection === 'certifications' && dragFrom === Number(index),
-            'ring-2 ring-blue-400 rounded': dragSection === 'certifications' && dragOver === Number(index) && dragFrom !== Number(index)
-          }"
-          draggable="true"
-          @dragstart="onDragStart('certifications', Number(index))"
-          @dragover="onDragOver($event, Number(index))"
-          @drop="onDrop('certifications')"
-          @dragend="onDragEnd"
-        >
-          <div class="flex flex-col items-center gap-0.5">
-            <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
-            <button @click="moveCertification(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
-            <button @click="moveCertification(Number(index), 1)" :disabled="Number(index) === cvDataLocal.certifications.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+        <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 relative">
+          <div
+            v-for="(cert, index) in (cvDataLocal.certifications || [])"
+            :key="cert + index"
+            class="flex gap-2 items-center transition-all bg-white dark:bg-gray-800"
+            :class="{
+              'opacity-40': dragSection === 'certifications' && dragFrom === Number(index),
+              'ring-2 ring-blue-400 rounded': dragSection === 'certifications' && dragOver === Number(index) && dragFrom !== Number(index)
+            }"
+            draggable="true"
+            @dragstart="onDragStart('certifications', Number(index))"
+            @dragover="onDragOver($event, Number(index))"
+            @drop="onDrop('certifications')"
+            @dragend="onDragEnd"
+          >
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+              <button @click="moveCertification(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
+              <button @click="moveCertification(Number(index), 1)" :disabled="Number(index) === cvDataLocal.certifications.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
+            </div>
+            <input v-model="cvDataLocal.certifications[Number(index)]" class="input-field flex-1" />
+            <button @click="cvDataLocal.certifications.splice(Number(index), 1)" class="del-btn self-center" type="button"><Trash2 :size="14" /></button>
           </div>
-          <input v-model="cvDataLocal.certifications[Number(index)]" class="input-field flex-1" />
-          <button @click="cvDataLocal.certifications.splice(Number(index), 1)" class="del-btn self-center" type="button"><Trash2 :size="14" /></button>
-        </div>
+        </TransitionGroup>
       </section>
 
       <section class="space-y-4">
@@ -463,4 +471,21 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 20px; }
+
+/* TransitionGroup Styles */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(15px);
+}
+.list-leave-active {
+  position: absolute;
+  width: calc(100% - 2px);
+  z-index: 10;
+}
 </style>

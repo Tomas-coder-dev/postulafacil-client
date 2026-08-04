@@ -33,7 +33,7 @@ const fabricioCV = {
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
   summary:
-    'Egresado de Diseño y Desarrollo de Software (TECSUP), con experiencia en desarrollo Full Stack mediante proyectos empresariales y construcción de soluciones web y móviles. Experiencia en desarrollo de APIs REST, integración de bases de datos, aplicaciones móviles y servicios externos. Enfocado en crear soluciones escalables, mantenibles y orientadas a mejorar procesos mediante buenas prácticas de desarrollo.',
+    'Egresado de Diseño y Desarrollo de Software (TECSUP) y estudiante de Ingeniería de Software (USIL), con experiencia en desarrollo Full Stack mediante proyectos empresariales y construcción de soluciones web y móviles. Experiencia en desarrollo de APIs REST, integración de bases de datos, aplicaciones móviles y servicios externos. Enfocado en crear soluciones escalables, mantenibles y orientadas a mejorar procesos mediante buenas prácticas de desarrollo.',
   experience: [
     {
       company: 'Syncra Connect — CRM Empresarial (Proyecto Unilene)',
@@ -93,6 +93,7 @@ const fabricioCV = {
     }
   ],
   education: [
+    { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Ingeniería de Software', date: '2026 – Actualidad', location: 'Lima, Peru' },
     { school: 'Tecsup', degree: 'Diseño y Desarrollo de Software', date: '2023 – 2025', location: 'Lima, Peru' }
   ],
   certifications: [

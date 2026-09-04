@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Copy, Trash2, FileText, Upload, Download } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+import { useCvStore } from '../store/cvStore'
 import ResumePreview from './ResumePreview.vue'
 import { translations } from '../utils/translations'
 
-const props = defineProps<{
-  cvList: any[]
-  currentLang: 'es' | 'en'
-}>()
-
-const emit = defineEmits<{
-  (e: 'createNew'): void
-  (e: 'editCv', index: number): void
-  (e: 'deleteCv', index: number): void
-  (e: 'duplicateCv', index: number): void
-  (e: 'importCv', data: any): void
-}>()
+const store = useCvStore()
+const { cvList, currentLang } = storeToRefs(store)
 
 const thumbnailSettings = {
   paperSize: 'A4',
@@ -48,15 +40,15 @@ const handleFileUpload = (event: Event) => {
     reader.onload = (e) => {
       try {
         const json = JSON.parse(e.target?.result as string)
-        emit('importCv', json)
+        store.importCv(json)
       } catch {
-        alert(props.currentLang === 'es' ? 'JSON inválido.' : 'Invalid JSON.')
+        alert(currentLang.value === 'es' ? 'JSON inválido.' : 'Invalid JSON.')
       }
     }
     reader.readAsText(file)
   } else {
     alert(
-      props.currentLang === 'es'
+      currentLang.value === 'es'
         ? 'En el Dashboard solo se importa JSON completo. Para PDF/DOCX usa Import dentro del editor.'
         : 'Dashboard imports full JSON only. For PDF/DOCX use Import inside the editor.'
     )
@@ -88,7 +80,7 @@ const exportCvPdf = async (cv: any, index: number) => {
 
   if (!pageEl) {
     printingIndex.value = null
-    alert(props.currentLang === 'es' ? 'No se pudo generar el PDF.' : 'Could not generate PDF.')
+    alert(currentLang.value === 'es' ? 'No se pudo generar el PDF.' : 'Could not generate PDF.')
     return
   }
 
@@ -177,7 +169,7 @@ const exportCvPdf = async (cv: any, index: number) => {
 
 const handleDownload = async (cv: any, index: number) => {
   const isPdf = confirm(
-    props.currentLang === 'es'
+    currentLang.value === 'es'
       ? '¿Descargar PDF?\n(Aceptar = PDF | Cancelar = JSON)'
       : 'Download PDF?\n(OK = PDF | Cancel = JSON)'
   )
@@ -221,7 +213,7 @@ const handleDownload = async (cv: any, index: number) => {
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <div
-        @click="emit('createNew')"
+        @click="store.createNewCV()"
         class="group cursor-pointer min-h-[420px] bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800/80 transition duration-300"
       >
         <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400 flex items-center justify-center text-4xl mb-4 group-hover:scale-110 transition shadow-sm">
@@ -253,7 +245,7 @@ const handleDownload = async (cv: any, index: number) => {
 
         <div
           class="relative flex-1 overflow-hidden bg-gray-200 dark:bg-gray-800 cursor-pointer"
-          @click="emit('editCv', index)"
+          @click="store.editCv(index)"
         >
           <div class="absolute top-4 left-1/2 -translate-x-1/2 origin-top transform scale-[0.35] shadow-lg pointer-events-none select-none bg-white">
             <ResumePreview
@@ -292,7 +284,7 @@ const handleDownload = async (cv: any, index: number) => {
             </button>
 
             <button
-              @click.stop="emit('duplicateCv', index)"
+              @click.stop="store.duplicateCV(index)"
               class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded transition"
               :title="currentLang === 'es' ? 'Duplicar' : 'Duplicate'"
               type="button"
@@ -301,7 +293,7 @@ const handleDownload = async (cv: any, index: number) => {
             </button>
 
             <button
-              @click.stop="emit('deleteCv', index)"
+              @click.stop="store.deleteCV(index)"
               class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition"
               :title="currentLang === 'es' ? 'Eliminar' : 'Delete'"
               type="button"

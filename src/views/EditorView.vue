@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useCvStore } from '../store/cvStore'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import EditFile from '../components/EditFile.vue'
@@ -9,15 +11,8 @@ import * as pdfjsLib from 'pdfjs-dist'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`
 
-const props = defineProps<{
-  initialData: any
-  currentLang: 'es' | 'en'
-}>()
-
-const emit = defineEmits<{
-  (e: 'save', payload: any): void
-  (e: 'back'): void
-}>()
+const store = useCvStore()
+const { currentLang, currentCv } = storeToRefs(store)
 
 const defaultSettings = {
   paperSize: 'A4' as 'A4' | 'Letter',
@@ -92,17 +87,17 @@ const handleKeydown = (e: KeyboardEvent) => {
 const scheduleAutoSave = () => {
   if (autoSaveTimer) clearTimeout(autoSaveTimer)
   autoSaveTimer = setTimeout(() => {
-    emit('save', cvData.value)
+    store.saveCV(JSON.parse(JSON.stringify(cvData.value)))
     lastSavedSnapshot.value = snapshot()
     hasUnsavedChanges.value = false
   }, 60000)
 }
 
 watch(
-  () => props.initialData,
+  currentCv,
   (val) => {
     if (!val) return
-    cvData.value = val
+    cvData.value = JSON.parse(JSON.stringify(val))
     if (!cvData.value.meta) cvData.value.meta = {}
     if (!cvData.value.meta.settings) cvData.value.meta.settings = { ...defaultSettings }
     syncingFromCv = true
@@ -143,18 +138,18 @@ watch(
 
 const handleSave = () => {
   if (autoSaveTimer) clearTimeout(autoSaveTimer)
-  emit('save', cvData.value)
+  store.saveCV(JSON.parse(JSON.stringify(cvData.value)))
   lastSavedSnapshot.value = snapshot()
   hasUnsavedChanges.value = false
 }
 
-const handleBack = () => emit('back')
+const handleBack = () => store.enterApp()
 
 type MobileTab = 'editor' | 'preview' | 'design'
 const mobileTab = ref<MobileTab>('preview')
 
 const tabLabel = computed(() => {
-  if (props.currentLang === 'es') return { editor: 'Editor', preview: 'Vista', design: 'Diseño' }
+  if (currentLang.value === 'es') return { editor: 'Editor', preview: 'Vista', design: 'Diseño' }
   return { editor: 'Editor', preview: 'Preview', design: 'Design' }
 })
 
@@ -238,7 +233,7 @@ const handleExportPDF = async () => {
     document.querySelector<HTMLElement>('.resume-page')
 
   if (!pageEl) {
-    alert(props.currentLang === 'es' ? 'No se encontró la hoja del CV.' : 'CV page not found.')
+    alert(currentLang.value === 'es' ? 'No se encontró la hoja del CV.' : 'CV page not found.')
     return
   }
 
@@ -325,7 +320,7 @@ const handleImportFile = async (file: File) => {
         settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
         queueMicrotask(() => { syncingFromCv = false })
       } catch {
-        alert(props.currentLang === 'es' ? 'JSON inválido' : 'Invalid JSON')
+        alert(currentLang.value === 'es' ? 'JSON inválido' : 'Invalid JSON')
       }
     }
     reader.readAsText(file)
@@ -340,7 +335,7 @@ const handleImportFile = async (file: File) => {
         const result = await mammoth.extractRawText({ arrayBuffer })
         cvData.value.summary = (result.value || '').trim()
       } catch {
-        alert(props.currentLang === 'es' ? 'Error al leer DOCX' : 'DOCX read error')
+        alert(currentLang.value === 'es' ? 'Error al leer DOCX' : 'DOCX read error')
       }
     }
     reader.readAsArrayBuffer(file)
@@ -362,14 +357,14 @@ const handleImportFile = async (file: File) => {
         }
         cvData.value.summary = fullText.trim()
       } catch {
-        alert(props.currentLang === 'es' ? 'Error al leer PDF' : 'PDF read error')
+        alert(currentLang.value === 'es' ? 'Error al leer PDF' : 'PDF read error')
       }
     }
     reader.readAsArrayBuffer(file)
     return
   }
 
-  alert(props.currentLang === 'es' ? 'Formato no soportado (.json, .docx, .pdf)' : 'Unsupported format (.json, .docx, .pdf)')
+  alert(currentLang.value === 'es' ? 'Formato no soportado (.json, .docx, .pdf)' : 'Unsupported format (.json, .docx, .pdf)')
 }
 </script>
 
@@ -377,9 +372,9 @@ const handleImportFile = async (file: File) => {
   <div class="bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
 
     <div v-if="hasUnsavedChanges" class="print:hidden bg-amber-500 text-white text-xs text-center py-1 px-4 flex items-center justify-center gap-2">
-      <span>{{ props.currentLang === 'es' ? 'Cambios sin guardar — guardando automáticamente...' : 'Unsaved changes — autosaving...' }}</span>
+      <span>{{ currentLang === 'es' ? 'Cambios sin guardar — guardando automáticamente...' : 'Unsaved changes — autosaving...' }}</span>
       <button @click="handleSave" class="underline font-bold hover:text-amber-100 transition" type="button">
-        {{ props.currentLang === 'es' ? 'Guardar ahora' : 'Save now' }}
+        {{ currentLang === 'es' ? 'Guardar ahora' : 'Save now' }}
       </button>
     </div>
 

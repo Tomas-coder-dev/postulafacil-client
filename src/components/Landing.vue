@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Rocket, Shield, Lock, Zap, LayoutTemplate, FileJson, CheckCircle2, Bot } from 'lucide-vue-next'
+import { storeToRefs } from 'pinia'
+import { useCvStore } from '../store/cvStore'
 
-const props = defineProps<{ currentLang: 'es' | 'en' }>()
-const emit = defineEmits<{ (e: 'start'): void }>()
+const store = useCvStore()
+const { currentLang } = storeToRefs(store)
 
 const texts = {
   es: {
@@ -51,7 +53,7 @@ const texts = {
   }
 } as const
 
-const locale = () => (props.currentLang === 'es' ? texts.es : texts.en)
+const locale = () => (currentLang.value === 'es' ? texts.es : texts.en)
 </script>
 
 <template>
@@ -67,7 +69,7 @@ const locale = () => (props.currentLang === 'es' ? texts.es : texts.en)
       </p>
 
       <button
-        @click="emit('start')"
+        @click="store.enterApp()"
         class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded shadow-lg hover:-translate-y-1 transition-all text-lg flex items-center gap-2 mx-auto"
         type="button"
       >

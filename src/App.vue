@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useHead } from '@vueuse/head'
+import { useI18n } from 'vue-i18n'
 import { useCvStore } from './store/cvStore'
 import NavBar from './components/NavBar.vue'
 import Dashboard from './components/Dashboard.vue'
@@ -9,6 +11,17 @@ import Landing from './components/Landing.vue'
 
 const store = useCvStore()
 const { currentView } = storeToRefs(store)
+const { t } = useI18n()
+
+useHead({
+  title: computed(() => `PostulaFácil - ${t('landingTitle')} Markdown!`),
+  meta: [
+    {
+      name: 'description',
+      content: computed(() => t('landingSubtitle'))
+    }
+  ]
+})
 
 onMounted(() => {
   store.initializeStore()

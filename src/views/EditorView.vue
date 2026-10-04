@@ -8,6 +8,7 @@ import EditFile from '../components/EditFile.vue'
 
 import * as mammoth from 'mammoth'
 import * as pdfjsLib from 'pdfjs-dist'
+import html2pdf from 'html2pdf.js'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`
 
@@ -196,34 +197,6 @@ const handleExportJSON = () => {
   URL.revokeObjectURL(url)
 }
 
-const waitTwoFrames = async () => {
-  await new Promise<void>((r) => requestAnimationFrame(() => r()))
-  await new Promise<void>((r) => requestAnimationFrame(() => r()))
-}
-
-const waitFonts = async () => {
-  if (document.fonts?.ready) await document.fonts.ready
-}
-
-const ensurePrintStyles = () => {
-  const id = 'pf-print-style'
-  if (document.getElementById(id)) return
-  const style = document.createElement('style')
-  style.id = id
-  style.textContent = `
-@media print {
-  @page { size: A4; margin: 0; }
-  html, body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body > *:not(#pf-print-root) { display: none !important; }
-  #pf-print-root { display: block !important; }
-  #pf-print-root .resume-page { box-shadow: none !important; margin: 0 auto !important; transform: none !important; }
-  header, section { break-inside: avoid; page-break-inside: avoid; }
-  ul, li { break-inside: avoid; page-break-inside: avoid; }
-}
-`
-  document.head.appendChild(style)
-}
-
 const handleExportPDF = async () => {
   await nextTick()
 
@@ -237,70 +210,29 @@ const handleExportPDF = async () => {
     return
   }
 
-  ensurePrintStyles()
+  // Save styles to restore later
+  const originalTransform = pageEl.style.transform
+  const originalBoxShadow = pageEl.style.boxShadow
+  pageEl.style.transform = 'none'
+  pageEl.style.boxShadow = 'none'
 
-  let root = document.getElementById('pf-print-root') as HTMLDivElement | null
-  if (!root) {
-    root = document.createElement('div')
-    root.id = 'pf-print-root'
-    root.style.display = 'none'
-    document.body.appendChild(root)
+  const opt = {
+    margin: 0,
+    filename: `${(cvData.value.fileName || 'CV').replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg' as const, quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: settings.value.paperSize === 'Letter' ? 'letter' : 'a4', orientation: 'portrait' as const }
   }
 
-  root.innerHTML = ''
-  const clone = pageEl.cloneNode(true) as HTMLElement
-  clone.removeAttribute('id')
-  clone.style.boxShadow = 'none'
-  clone.style.transform = 'none'
-  root.appendChild(clone)
-
-  const isLetter = settings.value.paperSize === 'Letter'
-  const pageSize = isLetter ? 'Letter' : 'A4'
-  const pageWidth = isLetter ? '216mm' : '210mm'
-  const pageHeight = isLetter ? '279mm' : '297mm'
-
-  const runtimeId = 'pf-print-runtime-style'
-  const existing = document.getElementById(runtimeId)
-  if (existing) existing.remove()
-
-  const runtime = document.createElement('style')
-  runtime.id = runtimeId
-  runtime.textContent = `
-@media print {
-  @page { size: ${pageSize}; margin: 0; }
-  #pf-print-root .resume-page {
-    width: ${pageWidth} !important;
-    min-height: ${pageHeight} !important;
-    background: ${settings.value.pageBackground || '#ffffff'} !important;
-    font-family: ${settings.value.fontFamily} !important;
-    font-size: ${settings.value.fontSize}pt !important;
-    line-height: ${settings.value.lineSpacing} !important;
-    padding-top: ${settings.value.marginTop}px !important;
-    padding-right: ${settings.value.marginRight}px !important;
-    padding-bottom: ${settings.value.marginBottom}px !important;
-    padding-left: ${settings.value.marginLeft}px !important;
-    box-sizing: border-box !important;
+  try {
+    await html2pdf().set(opt).from(pageEl).save()
+  } catch (error) {
+    alert(currentLang.value === 'es' ? 'Error al generar el PDF' : 'Error generating PDF')
+  } finally {
+    // Restore styles
+    pageEl.style.transform = originalTransform
+    pageEl.style.boxShadow = originalBoxShadow
   }
-  #pf-print-root .section-title {
-    color: ${settings.value.themeColor} !important;
-    border-bottom-color: ${settings.value.themeColor} !important;
-  }
-  #pf-print-root header {
-    border-bottom-color: ${settings.value.themeColor} !important;
-  }
-}
-`
-  document.head.appendChild(runtime)
-
-  await waitFonts()
-  await waitTwoFrames()
-
-  root.style.display = 'block'
-
-  const cleanup = () => { root!.style.display = 'none' }
-  window.addEventListener('afterprint', cleanup, { once: true })
-  window.print()
-  setTimeout(() => cleanup(), 1500)
 }
 
 const handleImportFile = async (file: File) => {

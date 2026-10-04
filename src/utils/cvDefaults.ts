@@ -20,13 +20,27 @@ export const fabricioCV = {
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
   summary:
-    'Egresado de Diseño y Desarrollo de Software (TECSUP) y estudiante de Ingeniería de Software (USIL), con experiencia en desarrollo Full Stack, Diseño Web y construcción de soluciones web, móviles y basadas en Inteligencia Artificial. Experiencia en desarrollo de APIs REST, integración de bases de datos, aplicaciones móviles y servicios externos. Enfocado en crear soluciones escalables, mantenibles y orientadas a mejorar procesos mediante buenas prácticas de desarrollo.',
+    'Egresado de Diseño y Desarrollo de Software (TECSUP), con grado de bachiller obtenido y título técnico en proceso de emisión, y estudiante de Ingeniería de Software (USIL). Desarrollador Full Stack con experiencia en desarrollo web y móvil, construcción de APIs REST, integración de bases de datos y servicios externos. Experiencia en desarrollo y mantenimiento de aplicaciones Android e iOS en producción, implementación de funcionalidades bajo arquitectura de microservicios, mejoras UI/UX y despliegue en tiendas de aplicaciones. Enfocado en construir soluciones escalables y mantenibles, optimizar procesos y mejorar la experiencia de usuario mediante buenas prácticas de desarrollo.',
   experience: [
     {
+      company: 'Belity — Belleza a domicilio',
+      role: 'Desarrollador Full Stack Mobile',
+      date: 'Oct 2026 - Actualidad',
+      location: 'Lima, Perú',
+      description: [
+        'Desarrollo y mantenimiento de la aplicación móvil Belity, plataforma de servicios de belleza a domicilio.',
+        'Desarrollo de funcionalidades móviles escalables utilizando Flutter para Android e iOS, participando en el ciclo completo de desarrollo y despliegue a producción.',
+        'Implementación de nuevas funcionalidades, mejoras de UI/UX y optimización de la experiencia de usuario.',
+        'Desarrollo y mantenimiento de integraciones bajo arquitectura de microservicios utilizando Laravel y Node.js para ampliar las funcionalidades de la plataforma.',
+        'Gestión de versiones y publicación de actualizaciones en Google Play y App Store.',
+        'Uso de herramientas de desarrollo asistido por IA (Cursor) para acelerar tareas de desarrollo, refactorización y resolución de incidencias.'
+      ]
+    },
+    {
       company: 'Firefly One',
-      role: 'Programador full stack',
-      date: 'Jul 2026 - Actualidad',
-      location: 'Lima, Perú (Remoto)',
+      role: 'Desarrollador Full Stack',
+      date: 'Jul 2026 - Sept 2026',
+      location: 'Lima, Perú',
       description: [
         'Desarrollo y modernización de sistemas empresariales críticos para el sector asegurador, garantizando alta disponibilidad y escalabilidad mediante arquitecturas frontend y backend robustas.',
         'Construcción de soluciones Full Stack utilizando Vue.js y Laravel, optimizando el rendimiento de la aplicación y asegurando una integración eficiente y segura de APIs REST.',
@@ -51,9 +65,9 @@ export const fabricioCV = {
     },
     {
       company: 'Cimark Comunicación Corporativa S.A.C.',
-      role: 'Programador full stack',
+      role: 'Desarrollador Full Stack',
       date: 'Feb 2024 - Ene 2025',
-      location: 'Lima, Perú (Remoto)',
+      location: 'Lima, Perú',
       description: [
         'Diseño y mejora de interfaces web enfocadas en experiencia de usuario (UX/UI).',
         'Propuesta e implementación de mejoras visuales y funcionales basadas en análisis de otras plataformas.',
@@ -94,8 +108,8 @@ export const fabricioCV = {
     }
   ],
   education: [
-    { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Ingeniería de Software', date: '2026 – Actualidad', location: 'Lima, Peru' },
-    { school: 'Tecsup', degree: 'Diseño y Desarrollo de Software', date: '2023 – 2025', location: 'Lima, Peru' }
+    { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Ingeniería de Software', date: '2026 – Actualidad', location: 'Lima, Perú' },
+    { school: 'TECSUP', degree: 'Diseño y Desarrollo de Software - Egresado | Grado de bachiller obtenido; Título técnico en proceso', date: '2023 – 2025', location: 'Lima, Perú' }
   ],
   certifications: [
     'Scrum Fundamentals Certified – SCRUMstudy',
@@ -124,13 +138,27 @@ export const fabricioCV_en = {
   location: 'Lima, Peru',
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
-  summary: 'Software Design and Development graduate (TECSUP) and Software Engineering student (USIL), with experience in Full Stack development, Web Design, and building web, mobile, and AI-based solutions. Experienced in REST APIs development, database integration, mobile applications, and external services. Focused on creating scalable, maintainable solutions and improving processes through best development practices.',
+  summary: 'Software Design and Development graduate (TECSUP), with a bachelor\'s degree obtained and technical title in process, and Software Engineering student (USIL). Full Stack Developer with experience in web and mobile development, building REST APIs, database integration, and external services. Experienced in developing and maintaining Android and iOS apps in production, implementing features under a microservices architecture, UI/UX improvements, and app store deployment. Focused on building scalable and maintainable solutions, optimizing processes, and improving user experience through best development practices.',
   experience: [
+    {
+      company: 'Belity — Belleza a domicilio',
+      role: 'Full Stack Mobile Developer',
+      date: 'Oct 2026 - Present',
+      location: 'Lima, Peru',
+      description: [
+        'Development and maintenance of the Belity mobile application, an at-home beauty services platform.',
+        'Developed scalable mobile solutions using Flutter for Android and iOS, participating in the full cycle from development to production deployment.',
+        'Implementation of new features, UI/UX improvements, and optimization of user experience.',
+        'Development and maintenance of integrations under a microservices architecture using Laravel and Node.js to expand platform functionalities.',
+        'Managed versioning and publishing updates on Google Play and the App Store.',
+        'Used AI-assisted development tools (Cursor) to accelerate development, refactoring, and issue resolution tasks.'
+      ]
+    },
     {
       company: 'Firefly One',
       role: 'Full Stack Developer',
-      date: 'Jul 2026 - Present',
-      location: 'Lima, Peru (Remote)',
+      date: 'Jul 2026 - Sept 2026',
+      location: 'Lima, Peru',
       description: [
         'Development and modernization of critical enterprise systems for the insurance sector, ensuring high availability and scalability through robust frontend and backend architectures.',
         'Built Full Stack solutions using Vue.js and Laravel, optimizing application performance and ensuring efficient and secure REST API integration.',
@@ -157,7 +185,7 @@ export const fabricioCV_en = {
       company: 'Cimark Comunicación Corporativa S.A.C.',
       role: 'Full Stack Developer',
       date: 'Feb 2024 - Jan 2025',
-      location: 'Lima, Peru (Remote)',
+      location: 'Lima, Peru',
       description: [
         'Designed and improved web interfaces focused on user experience (UX/UI).',
         'Proposed and implemented visual and functional improvements based on the analysis of other platforms.',
@@ -199,7 +227,7 @@ export const fabricioCV_en = {
   ],
   education: [
     { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Software Engineering', date: '2026 – Present', location: 'Lima, Peru' },
-    { school: 'Tecsup', degree: 'Software Design and Development', date: '2023 – 2025', location: 'Lima, Peru' }
+    { school: 'TECSUP', degree: 'Software Design and Development - Graduate | Bachelor\'s Degree obtained; Technical Title in process', date: '2023 – 2025', location: 'Lima, Peru' }
   ],
   certifications: [
     'Scrum Fundamentals Certified – SCRUMstudy',

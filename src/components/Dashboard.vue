@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useCvStore } from '../store/cvStore'
 import ResumePreview from './ResumePreview.vue'
 import { translations } from '../utils/translations'
+import html2pdf from 'html2pdf.js'
 
 const store = useCvStore()
 const { cvList, currentLang } = storeToRefs(store)
@@ -84,87 +85,26 @@ const exportCvPdf = async (cv: any, index: number) => {
     return
   }
 
-  // Reutilizar el mismo mecanismo que el editor
-  const id = 'pf-print-style'
-  if (!document.getElementById(id)) {
-    const style = document.createElement('style')
-    style.id = id
-    style.textContent = `
-@media print {
-  @page { size: A4; margin: 0; }
-  html, body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body > *:not(#pf-print-root) { display: none !important; }
-  #pf-print-root { display: block !important; }
-  #pf-print-root .resume-page { box-shadow: none !important; margin: 0 auto !important; transform: none !important; }
-  header, section, ul, li { break-inside: avoid; page-break-inside: avoid; }
-}
-`
-    document.head.appendChild(style)
+  // Desactivar scale/opacity para la captura de html2pdf
+  pageEl.style.opacity = '1'
+  pageEl.style.transform = 'none'
+  pageEl.style.boxShadow = 'none'
+
+  const opt = {
+    margin: 0,
+    filename: `${(cv.fileName || 'CV_Export').replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg' as const, quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: cvSettings.paperSize === 'Letter' ? 'letter' : 'a4', orientation: 'portrait' as const }
   }
 
-  let root = document.getElementById('pf-print-root') as HTMLDivElement | null
-  if (!root) {
-    root = document.createElement('div')
-    root.id = 'pf-print-root'
-    root.style.display = 'none'
-    document.body.appendChild(root)
-  }
-
-  root.innerHTML = ''
-  const clone = pageEl.cloneNode(true) as HTMLElement
-  clone.removeAttribute('id')
-  clone.style.boxShadow = 'none'
-  clone.style.transform = 'none'
-  root.appendChild(clone)
-
-  const isLetter = cvSettings.paperSize === 'Letter'
-  const pageSize = isLetter ? 'Letter' : 'A4'
-  const pageWidth = isLetter ? '216mm' : '210mm'
-  const pageHeight = isLetter ? '279mm' : '297mm'
-
-  const runtimeId = 'pf-print-runtime-style'
-  const existing = document.getElementById(runtimeId)
-  if (existing) existing.remove()
-
-  const runtime = document.createElement('style')
-  runtime.id = runtimeId
-  runtime.textContent = `
-@media print {
-  @page { size: ${pageSize}; margin: 0; }
-  #pf-print-root .resume-page {
-    width: ${pageWidth} !important;
-    min-height: ${pageHeight} !important;
-    background: ${cvSettings.pageBackground || '#ffffff'} !important;
-    font-family: ${cvSettings.fontFamily} !important;
-    font-size: ${cvSettings.fontSize}pt !important;
-    line-height: ${cvSettings.lineSpacing} !important;
-    padding-top: ${cvSettings.marginTop}px !important;
-    padding-right: ${cvSettings.marginRight}px !important;
-    padding-bottom: ${cvSettings.marginBottom}px !important;
-    padding-left: ${cvSettings.marginLeft}px !important;
-    box-sizing: border-box !important;
-  }
-  #pf-print-root .section-title {
-    color: ${cvSettings.themeColor} !important;
-    border-bottom-color: ${cvSettings.themeColor} !important;
-  }
-  #pf-print-root header {
-    border-bottom-color: ${cvSettings.themeColor} !important;
-  }
-}
-`
-  document.head.appendChild(runtime)
-
-  root.style.display = 'block'
-
-  const cleanup = () => {
-    root!.style.display = 'none'
+  try {
+    await html2pdf().set(opt).from(pageEl).save()
+  } catch (error) {
+    alert(currentLang.value === 'es' ? 'Error al generar el PDF' : 'Error generating PDF')
+  } finally {
     printingIndex.value = null
   }
-
-  window.addEventListener('afterprint', cleanup, { once: true })
-  window.print()
-  setTimeout(() => cleanup(), 1500)
 }
 
 const handleDownload = async (cv: any, index: number) => {

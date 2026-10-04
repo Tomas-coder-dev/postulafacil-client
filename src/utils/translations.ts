@@ -1,5 +1,22 @@
 export const translations = {
   es: {
+    // Landing
+    landingTitle: 'Crea tu CV Inteligente en',
+    landingSubtitle: 'PostulaFácil es una herramienta Open Source gratuita que potencia tu currículum con Inteligencia Artificial, manteniendo tus datos 100% privados.',
+    landingCta: 'Crear Mi Curriculum',
+    landingCol1Title: 'Potencia e Inteligencia',
+    landingCol2Title: 'Privacidad Primero',
+    landingL1_0: 'Gestión de múltiples CVs',
+    landingL1_1: 'Optimización con IA (ATS)',
+    landingL1_2: 'Vista previa en tiempo real',
+    landingL1_3: 'Exportar a PDF profesional',
+    landingL1_4: 'Totalmente personalizable',
+    landingL2_0: 'Open source y gratuito',
+    landingL2_1: 'Datos guardados localmente',
+    landingL2_2: 'Sin registro ni login',
+    landingL2_3: 'Sin rastreo de usuarios',
+    landingL2_4: 'Sin publicidad',
+
     dashboardTitle: 'Mis Curriculums',
     dashboardSubtitle: 'Gestiona, duplica o elimina tus versiones.',
     createNew: 'Nuevo CV',
@@ -9,7 +26,6 @@ export const translations = {
     duplicate: 'Duplicar',
     delete: 'Eliminar',
     edit: 'Editar',
-
     // Editor panel izquierdo
     personalInfo: 'Información Personal',
     education: 'Educación',
@@ -91,6 +107,23 @@ export const translations = {
     skillsOther: 'Otros'
   },
   en: {
+    // Landing
+    landingTitle: 'Write your AI Resume in',
+    landingSubtitle: 'PostulaFácil is a free, open-source tool that powers up your resume with Artificial Intelligence, while keeping your data 100% private.',
+    landingCta: 'Create My Resume',
+    landingCol1Title: 'Simple and Powerful',
+    landingCol2Title: 'Privacy First',
+    landingL1_0: 'Manage multiple resumes',
+    landingL1_1: 'AI Optimization (ATS)',
+    landingL1_2: 'Real-time preview',
+    landingL1_3: 'Export to PDF',
+    landingL1_4: 'Fully customizable',
+    landingL2_0: 'Open source and free',
+    landingL2_1: 'All data saved locally',
+    landingL2_2: 'No login needed',
+    landingL2_3: 'No user tracking',
+    landingL2_4: 'No ads',
+
     dashboardTitle: 'My Resumes',
     dashboardSubtitle: 'Manage, duplicate or delete your versions.',
     createNew: 'New Resume',
@@ -100,7 +133,6 @@ export const translations = {
     duplicate: 'Duplicate',
     delete: 'Delete',
     edit: 'Edit',
-
     // Editor panel left
     personalInfo: 'Personal Info',
     education: 'Education',

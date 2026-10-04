@@ -167,7 +167,7 @@ const handleDownload = async (cv: any, index: number) => {
       <div
         v-for="(cv, index) in cvList"
         :key="index"
-        class="group relative bg-gray-100 dark:bg-gray-900 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 flex flex-col min-h-[420px]"
+        class="group relative bg-white dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-200/60 dark:border-gray-700/50 flex flex-col min-h-[420px]"
       >
         <!-- ResumePreview a tamaño real, oculto, para capturar al imprimir -->
         <div
@@ -184,10 +184,10 @@ const handleDownload = async (cv: any, index: number) => {
         </div>
 
         <div
-          class="relative flex-1 overflow-hidden bg-gray-200 dark:bg-gray-800 cursor-pointer"
+          class="relative flex-1 overflow-hidden bg-gray-100/50 dark:bg-gray-900/40 cursor-pointer"
           @click="store.editCv(index)"
         >
-          <div class="absolute top-4 left-1/2 -translate-x-1/2 origin-top transform scale-[0.35] shadow-lg pointer-events-none select-none bg-white">
+          <div class="absolute top-4 left-1/2 -translate-x-1/2 origin-top transform scale-[0.35] shadow-xl rounded-sm overflow-hidden pointer-events-none select-none bg-white">
             <ResumePreview
               :cv-data="cv"
               :settings="thumbnailSettings"
@@ -196,20 +196,21 @@ const handleDownload = async (cv: any, index: number) => {
             />
           </div>
 
-          <div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <span class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-5 py-2 rounded-full font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-black/10 to-transparent transition-opacity duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 backdrop-blur-[2px]">
+            <span class="bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold shadow-xl transform translate-y-6 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               {{ t('edit', currentLang) }}
             </span>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center z-10 relative">
-          <div class="flex-1 min-w-0 pr-2">
-            <h3 class="font-bold text-gray-800 dark:text-white truncate text-sm" :title="cv.fileName || cv.name">
+        <div class="bg-white dark:bg-gray-800/80 p-5 border-t border-gray-100 dark:border-gray-700/50 flex justify-between items-center z-10 relative">
+          <div class="flex-1 min-w-0 pr-3">
+            <h3 class="font-bold text-gray-900 dark:text-gray-100 truncate text-base" :title="cv.fileName || cv.name">
               {{ cv.fileName || cv.name || 'CV Sin Título' }}
             </h3>
-            <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-              <FileText :size="10" /> {{ t('edited', currentLang) }}
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5 font-medium">
+              <FileText :size="12" /> {{ t('edited', currentLang) }}
             </p>
           </div>
 

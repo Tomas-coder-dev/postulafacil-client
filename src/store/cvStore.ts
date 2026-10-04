@@ -29,7 +29,21 @@ export const useCvStore = defineStore(
         cvList.value = [normalizeCv({ ...fabricioCV })]
       } else {
         // Ensure normalization for existing loaded items
-        cvList.value = cvList.value.map(normalizeCv)
+        cvList.value = cvList.value.map(cv => {
+          const normalized = normalizeCv(cv)
+          // MIGRACIÓN AUTOMÁTICA: Si es el CV de Fabricio y no tiene Belity en experiencia
+          const hasBelity = normalized.experience.some((e: any) => e.company.includes('Belity'))
+          if (!hasBelity && normalized.name === 'Fabricio Aylas Moreno') {
+            const baseCV = currentLang.value === 'en' ? fabricioCV_en : fabricioCV
+            normalized.experience = JSON.parse(JSON.stringify(baseCV.experience))
+            normalized.summary = baseCV.summary
+            normalized.projects = JSON.parse(JSON.stringify(baseCV.projects))
+            normalized.education = JSON.parse(JSON.stringify(baseCV.education))
+            normalized.certifications = JSON.parse(JSON.stringify(baseCV.certifications))
+            normalized.skills = JSON.parse(JSON.stringify(baseCV.skills))
+          }
+          return normalized
+        })
       }
     }
 

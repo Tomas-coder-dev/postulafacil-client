@@ -459,14 +459,14 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
 </template>
 
 <style scoped>
-.section-header { @apply text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-1 mb-2; }
-.label { @apply block text-[10px] uppercase font-bold text-gray-500 dark:text-gray-500 mb-1; }
-.input-field { @apply w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded p-2 text-sm text-gray-900 dark:text-gray-100 focus:border-postula-blue focus:ring-1 focus:ring-postula-blue outline-none transition; }
-.input-sm { @apply bg-transparent border-b border-gray-300 dark:border-gray-600 text-xs py-1 px-1 outline-none focus:border-postula-blue text-gray-700 dark:text-gray-200 placeholder-gray-400; }
-.card-item { @apply bg-gray-50 dark:bg-gray-700/30 p-3 rounded border border-gray-200 dark:border-gray-700; }
-.add-btn { @apply text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline; }
-.del-btn { @apply text-red-400 hover:text-red-600 p-1; }
-.move-btn { @apply text-gray-400 hover:text-blue-400 disabled:opacity-20 disabled:cursor-not-allowed p-0.5 transition-colors; }
+.section-header { @apply text-[11px] font-extrabold uppercase tracking-widest text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700/60 pb-2 mb-3; }
+.label { @apply block text-[10px] font-bold uppercase text-gray-500 dark:text-gray-400 mb-1.5; }
+.input-field { @apply w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700/60 rounded-lg p-2.5 text-sm text-gray-900 dark:text-gray-100 focus:bg-white dark:focus:bg-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-200 shadow-sm; }
+.input-sm { @apply bg-transparent border-b border-dashed border-gray-300 dark:border-gray-600/60 text-xs py-1.5 px-1 outline-none focus:border-solid focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 focus:shadow-sm rounded-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all; }
+.card-item { @apply bg-white dark:bg-gray-800/40 p-4 rounded-xl border border-gray-200 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-shadow duration-200 relative overflow-hidden; }
+.add-btn { @apply text-xs text-blue-600 dark:text-blue-400 font-bold hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-3 py-1 rounded-md transition-colors; }
+.del-btn { @apply text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 p-1.5 rounded-md transition-colors; }
+.move-btn { @apply text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 disabled:opacity-20 disabled:cursor-not-allowed p-1 rounded-md transition-colors; }
 .grip-handle { @apply flex items-center justify-center; }
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }

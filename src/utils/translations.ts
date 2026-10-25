@@ -37,11 +37,12 @@ export const translations = {
     exportPDF: 'Exportar PDF',
 
     // Títulos de secciones CV
+    cv_profileTitle: 'Perfil profesional',
     cv_experienceTitle: 'Experiencia Profesional',
-    cv_projectsTitle: 'Proyectos Relevantes',
+    cv_projectsTitle: 'Proyectos destacados',
     cv_educationTitle: 'Educación',
     cv_certificationsTitle: 'Certificaciones y Actividades',
-    cv_skillsTitle: 'Habilidades Adicionales',
+    cv_skillsTitle: 'Habilidades técnicas',
     cv_technologies: 'Tecnologías',
 
     // FILE + ajustes panel derecho
@@ -98,11 +99,11 @@ export const translations = {
 
     // Skills fijos
     skillsFrontend: 'Frontend',
-    skillsBackend: 'Backend',
-    skillsDB: 'Bases de Datos',
-    skillsMobile: 'Mobile',
-    skillsTools: 'Herramientas',
-    skillsCloudAi: 'Cloud & IA',
+    skillsBackend: 'Backend y APIs',
+    skillsDB: 'Bases de datos',
+    skillsMobile: 'Desarrollo móvil',
+    skillsTools: 'Herramientas y colaboración',
+    skillsCloudAi: 'Cloud, IA y procesamiento documental',
     skillsLanguages: 'Idiomas',
     skillsOther: 'Otros',
 
@@ -181,11 +182,12 @@ export const translations = {
     exportPDF: 'Export PDF',
 
     // CV section titles
+    cv_profileTitle: 'Professional profile',
     cv_experienceTitle: 'Professional Experience',
-    cv_projectsTitle: 'Relevant Projects',
+    cv_projectsTitle: 'Featured projects',
     cv_educationTitle: 'Education',
-    cv_certificationsTitle: 'Certifications & Activities',
-    cv_skillsTitle: 'Additional Skills',
+    cv_certificationsTitle: 'Certifications and activities',
+    cv_skillsTitle: 'Technical skills',
     cv_technologies: 'Technologies',
 
     // FILE + settings right panel
@@ -242,11 +244,11 @@ export const translations = {
 
     // Fixed skills
     skillsFrontend: 'Frontend',
-    skillsBackend: 'Backend',
-    skillsDB: 'Database',
-    skillsMobile: 'Mobile',
-    skillsTools: 'Tools',
-    skillsCloudAi: 'Cloud & AI',
+    skillsBackend: 'Backend and APIs',
+    skillsDB: 'Databases',
+    skillsMobile: 'Mobile development',
+    skillsTools: 'Tools and collaboration',
+    skillsCloudAi: 'Cloud, AI and document processing',
     skillsLanguages: 'Languages',
     skillsOther: 'Other',
 

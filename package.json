@@ -9,14 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-pdf/renderer": "^4.3.2",
     "@vueuse/head": "^2.0.0",
-    "docx": "^9.5.1",
-    "file-saver": "^2.0.5",
     "html2pdf.js": "^0.14.0",
     "lucide-vue-next": "^0.563.0",
     "mammoth": "^1.11.0",
-    "marked": "^17.0.1",
     "pdfjs-dist": "^5.4.624",
     "pinia": "^4.0.3",
     "pinia-plugin-persistedstate": "^4.7.1",

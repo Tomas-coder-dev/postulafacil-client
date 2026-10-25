@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watchEffect } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useHead } from '@vueuse/head'
 import { useI18n } from 'vue-i18n'
@@ -11,10 +11,14 @@ import Landing from './components/Landing.vue'
 
 const store = useCvStore()
 const { currentView } = storeToRefs(store)
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+watchEffect(() => {
+  locale.value = store.currentLang
+})
 
 useHead({
-  title: computed(() => `PostulaFácil - ${t('landingTitle')} Markdown!`),
+  title: computed(() => `PostulaFácil — ${t('landingTitle')}`),
   meta: [
     {
       name: 'description',

@@ -7,21 +7,19 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['vite.svg'],
+      includeAssets: ['favicon.svg', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
         name: 'PostulaFácil',
         short_name: 'PostulaFácil',
-        description: 'Crea y gestiona tu CV con Inteligencia Artificial',
+        description: 'Crea y gestiona tu CV en el navegador. Tus datos se quedan en el dispositivo.',
         theme_color: '#ea580c',
         background_color: '#111827',
         display: 'standalone',
         start_url: '/',
         icons: [
-          {
-            src: 'vite.svg',
-            sizes: '48x48',
-            type: 'image/svg+xml'
-          }
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }
         ]
       },
       workbox: {

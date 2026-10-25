@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Phone, Mail, Linkedin, MapPin, Github } from 'lucide-vue-next'
-import { translations } from '../utils/translations'
 
 const props = defineProps<{
   cvData: any
   settings: any
-  currentLang: 'es' | 'en'
   exportMode?: boolean
 }>()
 
-// @ts-ignore
-const t = (key: string) => (translations as any)[props.currentLang]?.[key] || key
+const { t } = useI18n()
 
 const pageStyle = computed<Record<string, string | number>>(() => {
   const width = props.settings.paperSize === 'Letter' ? '216mm' : '210mm'

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   Save,
   FileJson,
@@ -12,7 +13,6 @@ import {
   FileText,
   Monitor
 } from 'lucide-vue-next'
-import { translations } from '../utils/translations'
 
 type PaperSize = 'A4' | 'Letter'
 
@@ -32,8 +32,9 @@ const props = defineProps<{
     pageBackground: string
   }
   fileName: string
-  currentLang: 'es' | 'en'
 }>()
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'update:settings', value: any): void
@@ -43,9 +44,6 @@ const emit = defineEmits<{
   (e: 'importJSON', file: File): void
   (e: 'printPDF'): void
 }>()
-
-// @ts-ignore
-const t = (key: string) => translations[props.currentLang]?.[key] || key
 
 const localFileName = computed({
   get: () => props.fileName || props.cvData?.fileName || 'Nuevo_CV',
@@ -115,34 +113,37 @@ const applyPreset = (type: 'classic' | 'modern' | 'creative') => {
           <button @click="$emit('exportJSON')" class="btn-action" type="button"><FileJson :size="14" /> JSON</button>
 
           <label class="btn-action cursor-pointer">
-            <Upload :size="14" /> {{ t('import') }}
+            <Upload :size="14" /> {{ t('importFile') }}
             <input type="file" accept=".json,.pdf,.docx" class="hidden" @change="handleImportChange" />
           </label>
         </div>
+        <p class="text-[10px] leading-snug text-gray-500 dark:text-gray-400">
+          {{ t('importHint') }}
+        </p>
       </div>
     </div>
 
     <!-- DISEÑO -->
     <div class="p-5 space-y-6">
       <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
-        <Palette :size="14" /> {{ props.currentLang === 'es' ? 'Diseño' : 'Design' }}
+        <Palette :size="14" /> {{ t('design') }}
       </div>
 
       <!-- Estilos Predefinidos -->
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
           <Palette :size="14" />
-          <span>{{ props.currentLang === 'es' ? 'Estilos Rápidos' : 'Quick Styles' }}</span>
+          <span>{{ t('quickStyles') }}</span>
         </div>
         <div class="grid grid-cols-3 gap-2">
           <button @click="applyPreset('classic')" class="preset-btn" type="button">
-            {{ props.currentLang === 'es' ? 'Clásico' : 'Classic' }}
+            {{ t('classic') }}
           </button>
           <button @click="applyPreset('modern')" class="preset-btn" type="button">
-            {{ props.currentLang === 'es' ? 'Moderno' : 'Modern' }}
+            {{ t('modern') }}
           </button>
           <button @click="applyPreset('creative')" class="preset-btn" type="button">
-            {{ props.currentLang === 'es' ? 'Creativo' : 'Creative' }}
+            {{ t('creative') }}
           </button>
         </div>
       </div>
@@ -167,12 +168,12 @@ const applyPreset = (type: 'classic' | 'modern' | 'creative') => {
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wide text-[11px]">
           <Palette :size="14" />
-          <span>{{ props.currentLang === 'es' ? 'Colores' : 'Colors' }}</span>
+          <span>{{ t('colors') }}</span>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[10px] text-gray-400 mr-1">
-            {{ props.currentLang === 'es' ? 'Títulos' : 'Headings' }}
+            {{ t('headings') }}
           </span>
           <button
             v-for="c in themeColors"
@@ -193,7 +194,7 @@ const applyPreset = (type: 'classic' | 'modern' | 'creative') => {
 
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[10px] text-gray-400 mr-1">
-            {{ props.currentLang === 'es' ? 'Fondo hoja' : 'Page background' }}
+            {{ t('pageBackground') }}
           </span>
           <button
             v-for="c in bgColors"

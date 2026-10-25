@@ -1,77 +1,76 @@
 <script setup lang="ts">
-import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { useCvStore } from '../store/cvStore'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import EditFile from '../components/EditFile.vue'
+import { defaultSettings } from '../utils/cvDefaults'
 
 import * as mammoth from 'mammoth'
 import * as pdfjsLib from 'pdfjs-dist'
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import html2pdf from 'html2pdf.js'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.js`
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
 
 const store = useCvStore()
-const { currentLang, currentCv } = storeToRefs(store)
-
-const defaultSettings = {
-  paperSize: 'A4' as 'A4' | 'Letter',
-  lineSpacing: 1.3,
-  fontFamily: 'Times New Roman, serif',
-  fontSize: 11,
-  paragraphSpacing: 8,
-  marginTop: 40,
-  marginBottom: 40,
-  marginLeft: 50,
-  marginRight: 50,
-  themeColor: '#000000',
-  pageBackground: '#ffffff'
-}
+const { currentCv } = storeToRefs(store)
+const { t } = useI18n()
 
 const cvData = ref<any>({})
-const settings = ref({ ...defaultSettings })
+const settings = ref({
+  ...defaultSettings,
+  paperSize: defaultSettings.paperSize as 'A4' | 'Letter'
+})
 const hasUnsavedChanges = ref(false)
 const lastSavedSnapshot = ref('')
-const undoStack = ref<string[]>([])
-const redoStack = ref<string[]>([])
+const past = ref<string[]>([])
+const future = ref<string[]>([])
 const MAX_HISTORY = 50
 
 let syncingFromCv = false
+let applyingHistory = false
+let currentSnapshot = ''
 let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
 
 const snapshot = () => JSON.stringify({ cvData: cvData.value, settings: settings.value })
 
-const pushUndo = () => {
-  const current = snapshot()
-  if (undoStack.value[undoStack.value.length - 1] === current) return
-  undoStack.value.push(current)
-  if (undoStack.value.length > MAX_HISTORY) undoStack.value.shift()
-  redoStack.value = []
+const restoreSnapshot = (raw: string) => {
+  const parsed = JSON.parse(raw)
+  syncingFromCv = true
+  applyingHistory = true
+  cvData.value = parsed.cvData
+  settings.value = parsed.settings
+  currentSnapshot = raw
+  queueMicrotask(() => {
+    syncingFromCv = false
+    applyingHistory = false
+  })
+}
+
+const markDirty = () => {
+  hasUnsavedChanges.value = snapshot() !== lastSavedSnapshot.value
+  if (hasUnsavedChanges.value) scheduleAutoSave()
+  else if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
+    autoSaveTimer = null
+  }
 }
 
 const undo = () => {
-  if (undoStack.value.length === 0) return
-  const current = snapshot()
-  redoStack.value.push(current)
-  const prev = undoStack.value.pop()!
-  const parsed = JSON.parse(prev)
-  syncingFromCv = true
-  cvData.value = parsed.cvData
-  settings.value = parsed.settings
-  queueMicrotask(() => { syncingFromCv = false })
+  if (past.value.length === 0) return
+  future.value.push(snapshot())
+  restoreSnapshot(past.value.pop()!)
+  markDirty()
 }
 
 const redo = () => {
-  if (redoStack.value.length === 0) return
-  const current = snapshot()
-  undoStack.value.push(current)
-  const next = redoStack.value.pop()!
-  const parsed = JSON.parse(next)
-  syncingFromCv = true
-  cvData.value = parsed.cvData
-  settings.value = parsed.settings
-  queueMicrotask(() => { syncingFromCv = false })
+  if (future.value.length === 0) return
+  past.value.push(snapshot())
+  restoreSnapshot(future.value.pop()!)
+  markDirty()
 }
 
 const handleKeydown = (e: KeyboardEvent) => {
@@ -88,10 +87,8 @@ const handleKeydown = (e: KeyboardEvent) => {
 const scheduleAutoSave = () => {
   if (autoSaveTimer) clearTimeout(autoSaveTimer)
   autoSaveTimer = setTimeout(() => {
-    store.saveCV(JSON.parse(JSON.stringify(cvData.value)))
-    lastSavedSnapshot.value = snapshot()
-    hasUnsavedChanges.value = false
-  }, 60000)
+    handleSave()
+  }, 2000)
 }
 
 watch(
@@ -103,11 +100,12 @@ watch(
     if (!cvData.value.meta.settings) cvData.value.meta.settings = { ...defaultSettings }
     syncingFromCv = true
     settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
-    queueMicrotask(() => { syncingFromCv = false })
     lastSavedSnapshot.value = snapshot()
+    currentSnapshot = lastSavedSnapshot.value
     hasUnsavedChanges.value = false
-    undoStack.value = []
-    redoStack.value = []
+    past.value = []
+    future.value = []
+    queueMicrotask(() => { syncingFromCv = false })
   },
   { immediate: true }
 )
@@ -126,13 +124,19 @@ watch(
 watch(
   [cvData, settings],
   () => {
-    if (syncingFromCv) return
+    if (syncingFromCv || applyingHistory) return
     const current = snapshot()
-    if (current !== lastSavedSnapshot.value) {
-      hasUnsavedChanges.value = true
-      pushUndo()
-      scheduleAutoSave()
+    if (!currentSnapshot) {
+      currentSnapshot = current
+      return
     }
+    if (current === currentSnapshot) return
+    past.value.push(currentSnapshot)
+    if (past.value.length > MAX_HISTORY) past.value.shift()
+    future.value = []
+    currentSnapshot = current
+    hasUnsavedChanges.value = current !== lastSavedSnapshot.value
+    scheduleAutoSave()
   },
   { deep: true }
 )
@@ -144,15 +148,13 @@ const handleSave = () => {
   hasUnsavedChanges.value = false
 }
 
-const handleBack = () => store.enterApp()
+const handleBack = () => {
+  handleSave()
+  store.enterApp()
+}
 
 type MobileTab = 'editor' | 'preview' | 'design'
 const mobileTab = ref<MobileTab>('preview')
-
-const tabLabel = computed(() => {
-  if (currentLang.value === 'es') return { editor: 'Editor', preview: 'Vista', design: 'Diseño' }
-  return { editor: 'Editor', preview: 'Preview', design: 'Design' }
-})
 
 const previewContainer = ref<HTMLElement | null>(null)
 const previewScale = ref(1)
@@ -170,16 +172,22 @@ const updateScale = () => {
   previewHeight.value = actualHeight * scale
 }
 
+const flushOnLeave = () => {
+  handleSave()
+}
+
 onMounted(() => {
   updateScale()
   window.addEventListener('resize', updateScale)
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('beforeunload', flushOnLeave)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale)
   window.removeEventListener('keydown', handleKeydown)
-  if (autoSaveTimer) clearTimeout(autoSaveTimer)
+  window.removeEventListener('beforeunload', flushOnLeave)
+  flushOnLeave()
 })
 
 watch(mobileTab, async () => {
@@ -206,7 +214,7 @@ const handleExportPDF = async () => {
     document.querySelector<HTMLElement>('.resume-page')
 
   if (!pageEl) {
-    alert(currentLang.value === 'es' ? 'No se encontró la hoja del CV.' : 'CV page not found.')
+    alert(t('cvPageMissing'))
     return
   }
 
@@ -227,7 +235,7 @@ const handleExportPDF = async () => {
   try {
     await html2pdf().set(opt).from(pageEl).save()
   } catch (error) {
-    alert(currentLang.value === 'es' ? 'Error al generar el PDF' : 'Error generating PDF')
+    alert(t('pdfError'))
   } finally {
     // Restore styles
     pageEl.style.transform = originalTransform
@@ -252,7 +260,7 @@ const handleImportFile = async (file: File) => {
         settings.value = { ...defaultSettings, ...cvData.value.meta.settings }
         queueMicrotask(() => { syncingFromCv = false })
       } catch {
-        alert(currentLang.value === 'es' ? 'JSON inválido' : 'Invalid JSON')
+        alert(t('jsonInvalid'))
       }
     }
     reader.readAsText(file)
@@ -267,7 +275,7 @@ const handleImportFile = async (file: File) => {
         const result = await mammoth.extractRawText({ arrayBuffer })
         cvData.value.summary = (result.value || '').trim()
       } catch {
-        alert(currentLang.value === 'es' ? 'Error al leer DOCX' : 'DOCX read error')
+        alert(t('docxError'))
       }
     }
     reader.readAsArrayBuffer(file)
@@ -289,14 +297,14 @@ const handleImportFile = async (file: File) => {
         }
         cvData.value.summary = fullText.trim()
       } catch {
-        alert(currentLang.value === 'es' ? 'Error al leer PDF' : 'PDF read error')
+        alert(t('pdfReadError'))
       }
     }
     reader.readAsArrayBuffer(file)
     return
   }
 
-  alert(currentLang.value === 'es' ? 'Formato no soportado (.json, .docx, .pdf)' : 'Unsupported format (.json, .docx, .pdf)')
+  alert(t('unsupportedFormat'))
 }
 </script>
 
@@ -304,9 +312,9 @@ const handleImportFile = async (file: File) => {
   <div class="bg-gray-100 dark:bg-gray-900 min-h-[calc(100vh-64px)]">
 
     <div v-if="hasUnsavedChanges" class="print:hidden bg-amber-500 text-white text-xs text-center py-1 px-4 flex items-center justify-center gap-2">
-      <span>{{ currentLang === 'es' ? 'Cambios sin guardar — guardando automáticamente...' : 'Unsaved changes — autosaving...' }}</span>
+      <span>{{ t('unsavedBanner') }}</span>
       <button @click="handleSave" class="underline font-bold hover:text-amber-100 transition" type="button">
-        {{ currentLang === 'es' ? 'Guardar ahora' : 'Save now' }}
+        {{ t('saveNow') }}
       </button>
     </div>
 
@@ -317,27 +325,27 @@ const handleImportFile = async (file: File) => {
           class="px-3 py-2 rounded text-xs font-semibold border"
           :class="mobileTab === 'editor' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
           @click="mobileTab = 'editor'"
-        >{{ tabLabel.editor }}</button>
+        >{{ t('tabEditor') }}</button>
 
         <button
           type="button"
           class="px-3 py-2 rounded text-xs font-semibold border"
           :class="mobileTab === 'preview' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
           @click="mobileTab = 'preview'"
-        >{{ tabLabel.preview }}</button>
+        >{{ t('tabPreview') }}</button>
 
         <button
           type="button"
           class="px-3 py-2 rounded text-xs font-semibold border"
           :class="mobileTab === 'design' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'"
           @click="mobileTab = 'design'"
-        >{{ tabLabel.design }}</button>
+        >{{ t('tabDesign') }}</button>
       </div>
     </div>
 
     <div class="flex flex-col lg:flex-row lg:h-[calc(100vh-64px)] overflow-hidden">
       <div class="lg:w-2/5 lg:overflow-y-auto print:hidden" :class="mobileTab === 'editor' ? 'block' : 'hidden lg:block'">
-        <ResumeEditor v-model:cvData="cvData" :current-lang="currentLang" @save="handleSave" @back="handleBack" />
+        <ResumeEditor v-model:cvData="cvData" @save="handleSave" @back="handleBack" />
       </div>
 
       <div
@@ -354,7 +362,7 @@ const handleImportFile = async (file: File) => {
               height: previewHeight > 0 ? `${previewHeight}px` : 'auto'
             }"
           >
-            <ResumePreview :cv-data="cvData" :settings="settings" :current-lang="currentLang" :export-mode="true" />
+            <ResumePreview :cv-data="cvData" :settings="settings" :export-mode="true" />
           </div>
         </div>
       </div>
@@ -367,7 +375,6 @@ const handleImportFile = async (file: File) => {
           v-model:settings="settings"
           v-model:fileName="cvData.fileName"
           :cv-data="cvData"
-          :current-lang="currentLang"
           @save="handleSave"
           @exportJSON="handleExportJSON"
           @importJSON="handleImportFile"

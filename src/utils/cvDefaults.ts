@@ -20,20 +20,19 @@ export const fabricioCV = {
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
   summary:
-    'Egresado de Diseño y Desarrollo de Software (TECSUP), con grado de bachiller obtenido y título técnico en proceso de emisión, y estudiante de Ingeniería de Software (USIL). Desarrollador Full Stack con experiencia en desarrollo web y móvil, construcción de APIs REST, integración de bases de datos y servicios externos. Experiencia en desarrollo y mantenimiento de aplicaciones Android e iOS en producción, implementación de funcionalidades bajo arquitectura de microservicios, mejoras UI/UX y despliegue en tiendas de aplicaciones. Enfocado en construir soluciones escalables y mantenibles, optimizar procesos y mejorar la experiencia de usuario mediante buenas prácticas de desarrollo.',
+    'Desarrollador Full Stack. Experiencia en apps Android e iOS en producción (Flutter), APIs y microservicios (Node.js, TypeScript, Laravel y .NET) y productos web (Vue.js y Angular), en biometría, KYC, OCR, visión por computadora, sistemas empresariales y CRM. Despliegues en Google Cloud Run, Google Play y App Store. Egresado de Diseño y Desarrollo de Software (TECSUP), con grado de bachiller, y estudiante de Ingeniería de Software (USIL).',
   experience: [
     {
       company: 'Belity — Belleza a domicilio',
       role: 'Desarrollador Full Stack Mobile',
       date: 'Oct 2026 - Actualidad',
-      location: 'Lima, Perú',
+      location: 'Lima, Perú · Presencial',
       description: [
-        'Desarrollo y mantenimiento de la aplicación móvil Belity, plataforma de servicios de belleza a domicilio.',
-        'Desarrollo de funcionalidades móviles escalables utilizando Flutter para Android e iOS, participando en el ciclo completo de desarrollo y despliegue a producción.',
-        'Implementación de nuevas funcionalidades, mejoras de UI/UX y optimización de la experiencia de usuario.',
-        'Desarrollo y mantenimiento de integraciones bajo arquitectura de microservicios utilizando Laravel y Node.js para ampliar las funcionalidades de la plataforma.',
-        'Gestión de versiones y publicación de actualizaciones en Google Play y App Store.',
-        'Uso de herramientas de desarrollo asistido por IA (Cursor) para acelerar tareas de desarrollo, refactorización y resolución de incidencias.'
+        'Biometría y KYC: validación facial y prueba de vida con AWS Rekognition (CompareFaces y Face Liveness).',
+        'IA y visión computacional: integración de Grok para clasificar imágenes y evaluar su calidad visual, agilizando el onboarding de profesionales.',
+        'OCR y validación documental: lectura de DNI, cédulas y pasaportes (MRZ/ICAO) con Google ML Kit, incluida la validación de documentos en PDF.',
+        'Backend y cloud: microservicios en Node.js, TypeScript y Express, desplegados en Google Cloud Run con Docker e integrados con Laravel.',
+        'Desarrollo móvil y releases: mantenimiento de la app Flutter (GetX y Firebase) y publicación de versiones en Google Play Console y App Store Connect.'
       ]
     },
     {
@@ -92,24 +91,24 @@ export const fabricioCV = {
   ],
   projects: [
     {
-      name: 'ULenguage — Aplicación móvil inteligente de traducción cultural Quechua',
-      description: 'Aplicación móvil orientada a turistas en Cusco para traducción quechua-español-inglés. Permite reconocer texto mediante imágenes, realizar traducciones automáticas y generar explicaciones culturales utilizando inteligencia artificial. Desarrollo de solución completa incluyendo aplicación móvil, backend, APIs y gestión de datos.',
+      name: 'ULenguage — Traducción cultural quechua',
+      description: 'App móvil para turistas en Cusco que traduce entre quechua, español e inglés. Reconoce texto desde una foto, traduce en el momento y explica el contexto cultural con inteligencia artificial. Incluye la aplicación, el backend, las APIs y la base de datos.',
       tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, Swagger'
     },
     {
-      name: 'SaveBot — Plataforma de respaldo multimedia mediante Telegram',
-      description: 'Aplicación web integrada con un bot de Telegram para automatizar el respaldo y envío de imágenes. Permite cargar archivos desde una plataforma web y gestionar su distribución mediante integración con Telegram Bot API.',
+      name: 'SaveBot — Respaldo de imágenes por Telegram',
+      description: 'Plataforma web conectada a un bot de Telegram para respaldar y enviar imágenes. El usuario carga los archivos en la web y el bot se encarga de distribuirlos.',
       tech: 'JavaScript, Node.js, Telegram Bot API, APIs REST, HTML, CSS, Git'
     },
     {
-      name: 'PostulaFácil — Plataforma Inteligente para Creación y Gestión de CVs',
-      description: 'Aplicación web para creación, edición y administración de currículums con enfoque en privacidad y personalización.',
-      tech: 'Vue.js 3, TypeScript, Composition API, TailwindCSS, JSON, PDF Export'
+      name: 'PostulaFácil — Editor de currículums',
+      description: 'Aplicación web para crear, editar y exportar currículums en el navegador, con vista previa en tiempo real y los datos guardados en el dispositivo.',
+      tech: 'Vue.js 3, TypeScript, TailwindCSS, JSON, PDF'
     }
   ],
   education: [
     { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Ingeniería de Software', date: '2026 – Actualidad', location: 'Lima, Perú' },
-    { school: 'TECSUP', degree: 'Diseño y Desarrollo de Software - Egresado | Grado de bachiller obtenido; Título técnico en proceso', date: '2023 – 2025', location: 'Lima, Perú' }
+    { school: 'TECSUP', degree: 'Diseño y Desarrollo de Software — Egresado, grado de bachiller', date: '2023 – 2025', location: 'Lima, Perú' }
   ],
   certifications: [
     'Scrum Fundamentals Certified – SCRUMstudy',
@@ -122,13 +121,13 @@ export const fabricioCV = {
     frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
     backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, APIs REST, JWT, Swagger',
     db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
-    mobile: 'Flutter, Dart, Kotlin',
-    tools: 'Linux, Git, GitHub, Postman, Swagger',
-    cloudAi: 'Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
+    mobile: 'Flutter, Dart, GetX, Firebase, Kotlin',
+    tools: 'Linux, Git, GitHub, Docker, Postman, Swagger',
+    cloudAi: 'AWS Rekognition, Google ML Kit, Grok, Google Cloud Run, Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
     languages: ''
   },
   fileName: 'CV_Principal_Fabricio',
-  meta: { settings: { ...defaultSettings } }
+  meta: { settings: { ...defaultSettings }, contentRevision: 3 }
 }
 
 export const fabricioCV_en = {
@@ -138,20 +137,19 @@ export const fabricioCV_en = {
   location: 'Lima, Peru',
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
-  summary: 'Software Design and Development graduate (TECSUP), with a bachelor\'s degree obtained and technical title in process, and Software Engineering student (USIL). Full Stack Developer with experience in web and mobile development, building REST APIs, database integration, and external services. Experienced in developing and maintaining Android and iOS apps in production, implementing features under a microservices architecture, UI/UX improvements, and app store deployment. Focused on building scalable and maintainable solutions, optimizing processes, and improving user experience through best development practices.',
+  summary: 'Full Stack developer. Experience shipping Android and iOS apps (Flutter), APIs and microservices (Node.js, TypeScript, Laravel, and .NET), and web products (Vue.js and Angular), across biometrics, KYC, OCR, computer vision, enterprise systems, and CRM. Deployments on Google Cloud Run, Google Play, and the App Store. Software Design and Development graduate (TECSUP), with a bachelor\'s degree, and a Software Engineering student (USIL).',
   experience: [
     {
       company: 'Belity — Belleza a domicilio',
       role: 'Full Stack Mobile Developer',
       date: 'Oct 2026 - Present',
-      location: 'Lima, Peru',
+      location: 'Lima, Peru · On-site',
       description: [
-        'Development and maintenance of the Belity mobile application, an at-home beauty services platform.',
-        'Developed scalable mobile solutions using Flutter for Android and iOS, participating in the full cycle from development to production deployment.',
-        'Implementation of new features, UI/UX improvements, and optimization of user experience.',
-        'Development and maintenance of integrations under a microservices architecture using Laravel and Node.js to expand platform functionalities.',
-        'Managed versioning and publishing updates on Google Play and the App Store.',
-        'Used AI-assisted development tools (Cursor) to accelerate development, refactoring, and issue resolution tasks.'
+        'Biometrics and KYC: face matching and liveness checks with AWS Rekognition (CompareFaces and Face Liveness).',
+        'AI and computer vision: Grok integration to classify images and score visual quality, speeding up professional onboarding.',
+        'OCR and document validation: reading of national IDs and passports (MRZ/ICAO) with Google ML Kit, including PDF document checks.',
+        'Backend and cloud: microservices in Node.js, TypeScript, and Express, deployed on Google Cloud Run with Docker and integrated with Laravel.',
+        'Mobile development and releases: maintenance of the Flutter app (GetX and Firebase) and publishing in Google Play Console and App Store Connect.'
       ]
     },
     {
@@ -210,24 +208,24 @@ export const fabricioCV_en = {
   ],
   projects: [
     {
-      name: 'ULenguage — Intelligent Quechua cultural translation mobile app',
-      description: 'Mobile application aimed at tourists in Cusco for Quechua-Spanish-English translation. Allows text recognition via images, automatic translations, and cultural explanations using artificial intelligence. Developed a complete solution including a mobile app, backend, APIs, and data management.',
+      name: 'ULenguage — Quechua cultural translation',
+      description: 'Mobile app for tourists in Cusco that translates between Quechua, Spanish, and English. It reads text from a photo, translates it on the spot, and explains the cultural context with AI. Includes the app, backend, APIs, and database.',
       tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, Swagger'
     },
     {
-      name: 'SaveBot — Multimedia backup platform via Telegram',
-      description: 'Web application integrated with a Telegram bot to automate the backup and sending of images. Allows uploading files from a web platform and managing their distribution via Telegram Bot API integration.',
+      name: 'SaveBot — Image backup via Telegram',
+      description: 'Web platform connected to a Telegram bot for backing up and sending images. Users upload files on the web and the bot handles distribution.',
       tech: 'JavaScript, Node.js, Telegram Bot API, REST APIs, HTML, CSS, Git'
     },
     {
-      name: 'PostulaFácil — Intelligent Platform for CV Creation and Management',
-      description: 'Web application for creating, editing, and managing resumes with a focus on privacy and customization.',
-      tech: 'Vue.js 3, TypeScript, Composition API, TailwindCSS, JSON, PDF Export'
+      name: 'PostulaFácil — Resume editor',
+      description: 'Web app to create, edit, and export resumes in the browser, with a live preview and data stored on the device.',
+      tech: 'Vue.js 3, TypeScript, TailwindCSS, JSON, PDF'
     }
   ],
   education: [
     { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Software Engineering', date: '2026 – Present', location: 'Lima, Peru' },
-    { school: 'TECSUP', degree: 'Software Design and Development - Graduate | Bachelor\'s Degree obtained; Technical Title in process', date: '2023 – 2025', location: 'Lima, Peru' }
+    { school: 'TECSUP', degree: 'Software Design and Development — Graduate, bachelor\'s degree', date: '2023 – 2025', location: 'Lima, Peru' }
   ],
   certifications: [
     'Scrum Fundamentals Certified – SCRUMstudy',
@@ -240,13 +238,13 @@ export const fabricioCV_en = {
     frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
     backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, REST APIs, JWT, Swagger',
     db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
-    mobile: 'Flutter, Dart, Kotlin',
-    tools: 'Linux, Git, GitHub, Postman, Swagger',
-    cloudAi: 'Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
+    mobile: 'Flutter, Dart, GetX, Firebase, Kotlin',
+    tools: 'Linux, Git, GitHub, Docker, Postman, Swagger',
+    cloudAi: 'AWS Rekognition, Google ML Kit, Grok, Google Cloud Run, Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
     languages: 'Spanish (Native), English'
   },
   fileName: 'CV_Main_Fabricio_EN',
-  meta: { settings: { ...defaultSettings } }
+  meta: { settings: { ...defaultSettings }, contentRevision: 3 }
 }
 
 export const normalizeCv = (cv: any) => {
@@ -316,5 +314,69 @@ export const normalizeCv = (cv: any) => {
   if (!cv.meta.settings) cv.meta.settings = { ...defaultSettings }
   cv.meta.settings = { ...defaultSettings, ...cv.meta.settings }
 
+  return cv
+}
+
+export const PROFILE_REVISION = 3
+
+export function createEmptyCv(fileName: string) {
+  return normalizeCv({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    linkedin: '',
+    github: '',
+    summary: '',
+    experience: [],
+    projects: [],
+    education: [],
+    certifications: [],
+    skills: {},
+    fileName,
+    meta: { settings: { ...defaultSettings }, contentRevision: PROFILE_REVISION }
+  })
+}
+
+const OLD_MOBILE = 'Flutter, Dart, Kotlin'
+const OLD_TOOLS = 'Linux, Git, GitHub, Postman, Swagger'
+const OLD_CLOUD = 'Google Gemini AI, Google Vision API, OCR, Telegram Bot API'
+
+export function applyProfileRevision(cv: any) {
+  if (!cv || cv.name !== 'Fabricio Aylas Moreno') return cv
+  if ((cv.meta?.contentRevision ?? 0) >= PROFILE_REVISION) return cv
+
+  const belityRole = String(
+    cv.experience?.find((e: any) => String(e?.company || '').includes('Belity'))?.role || ''
+  )
+  const isEn =
+    String(cv.fileName || '').includes('_EN') ||
+    String(cv.summary || '').startsWith('Software Design') ||
+    belityRole.includes('Developer')
+
+  const base = isEn ? fabricioCV_en : fabricioCV
+  cv.summary = base.summary
+  cv.projects = JSON.parse(JSON.stringify(base.projects))
+
+  if (Array.isArray(cv.education)) {
+    const baseTecsup = base.education.find((e: any) => String(e?.school || '').includes('TECSUP'))
+    const localTecsup = cv.education.find((e: any) => String(e?.school || '').includes('TECSUP'))
+    if (baseTecsup && localTecsup) localTecsup.degree = baseTecsup.degree
+  }
+
+  const belity = JSON.parse(JSON.stringify(base.experience[0]))
+  if (!Array.isArray(cv.experience)) cv.experience = []
+  const idx = cv.experience.findIndex((e: any) => String(e?.company || '').includes('Belity'))
+  if (idx >= 0) cv.experience[idx] = belity
+  else cv.experience.unshift(belity)
+
+  if (cv.skills && typeof cv.skills === 'object' && !Array.isArray(cv.skills)) {
+    if (cv.skills.mobile === OLD_MOBILE) cv.skills.mobile = base.skills.mobile
+    if (cv.skills.tools === OLD_TOOLS) cv.skills.tools = base.skills.tools
+    if (cv.skills.cloudAi === OLD_CLOUD) cv.skills.cloudAi = base.skills.cloudAi
+  }
+
+  if (!cv.meta) cv.meta = {}
+  cv.meta.contentRevision = PROFILE_REVISION
   return cv
 }

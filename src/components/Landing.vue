@@ -2,15 +2,9 @@
 import { Rocket, Shield, Lock, Zap, LayoutTemplate, FileJson, CheckCircle2, Bot } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { useCvStore } from '../store/cvStore'
-import { watchEffect } from 'vue'
 
 const store = useCvStore()
-const { t, locale } = useI18n()
-
-// Sincronizar el locale de vue-i18n con el del store
-watchEffect(() => {
-  locale.value = store.currentLang
-})
+const { t } = useI18n()
 
 const list1 = [
   { text: 'landingL1_0', icon: LayoutTemplate },
@@ -34,7 +28,6 @@ const list2 = [
     <div class="text-center max-w-4xl mx-auto mt-12 md:mt-0">
       <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 dark:text-white mb-6 tracking-tight leading-tight">
         {{ t('landingTitle') }}
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">Markdown</span>!
       </h1>
 
       <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed max-w-2xl mx-auto">

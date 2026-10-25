@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { useCvStore } from '../store/cvStore'
 import ThemeToggle from './ThemeToggle.vue'
 import LangSwitch from './LangSwitch.vue'
 
 const store = useCvStore()
 const { darkMode, currentLang } = storeToRefs(store)
+const { t } = useI18n()
 
 const deferredPrompt = ref<any>(null)
 const showInstall = ref(false)
@@ -55,7 +57,7 @@ const installApp = async () => {
           <polyline points="7 10 12 15 17 10"/>
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        {{ currentLang === 'es' ? 'Instalar app' : 'Install app' }}
+        {{ t('installApp') }}
       </button>
 
       <LangSwitch

@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Trash2, ChevronUp, ChevronDown, GripVertical } from 'lucide-vue-next'
-import { translations } from '../utils/translations'
 
 const props = defineProps<{
   cvData: any
-  currentLang: 'es' | 'en'
 }>()
+
+const { t, locale } = useI18n()
 
 const emit = defineEmits<{
   (e: 'update:cvData', value: any): void
   (e: 'save'): void
   (e: 'back'): void
 }>()
-
-const t = (key: string) => (translations as any)[props.currentLang]?.[key] || key
 
 const unwrap = (v: any) => (v && typeof v === 'object' && 'value' in v ? v.value : v)
 
@@ -129,7 +128,7 @@ const extraSkillEntries = computed<SkillEntry[]>(() => {
 })
 
 const generateUniqueKey = (skills: Record<string, any>) => {
-  let base = props.currentLang === 'es' ? 'nueva_habilidad' : 'new_skill'
+  let base = locale.value === 'en' ? 'new_skill' : 'nueva_habilidad'
   base = base.toLowerCase().replace(/\s+/g, '_')
   if (skills[base] === undefined) return base
   let i = 2
@@ -171,11 +170,11 @@ const renameExtraSkillKey = (oldKey: string, newKeyRaw: string) => {
   const newKey = newKeyRaw.trim().toLowerCase().replace(/\s+/g, '_')
   if (!newKey) return
   if ((fixedSkillKeys as readonly string[]).includes(newKey)) {
-    alert(props.currentLang === 'es' ? 'Ese nombre está reservado (campo fijo).' : 'That name is reserved (fixed field).')
+    alert(t('skillReserved'))
     return
   }
   if (newKey !== oldKey && skills[newKey] !== undefined) {
-    alert(props.currentLang === 'es' ? 'Ya existe una habilidad con ese nombre.' : 'A skill with that name already exists.')
+    alert(t('skillDuplicate'))
     return
   }
   const value = skills[oldKey]
@@ -360,7 +359,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-1">
           <h3 class="section-header !border-0 !mb-0">{{ t('cv_certificationsTitle') }}</h3>
           <button @click="addCertification" class="add-btn" type="button">
-            + {{ props.currentLang === 'es' ? 'Agregar certificación' : 'Add certification' }}
+            + {{ t('addCertification') }}
           </button>
         </div>
         <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 relative">
@@ -393,7 +392,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         <div class="flex justify-between items-center">
           <h3 class="section-header !border-b-0 !mb-0">{{ t('skills') }}</h3>
           <button @click="handleAddSkillsButton" class="add-btn" type="button">
-            {{ props.currentLang === 'es' ? '+ Agregar habilidades' : '+ Add skills' }}
+            {{ t('addSkills') }}
           </button>
         </div>
         <div v-if="skillsReady" class="space-y-3">
@@ -427,7 +426,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
           </div>
           <div v-if="extraSkillEntries.length" class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4 space-y-3">
             <div class="text-[10px] uppercase font-bold text-gray-500">
-              {{ props.currentLang === 'es' ? 'Habilidades personalizadas' : 'Custom skills' }}
+              {{ t('customSkills') }}
             </div>
             <div v-for="entry in extraSkillEntries" :key="entry.id" class="card-item">
               <div class="flex gap-2 items-center mb-2">
@@ -436,7 +435,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
                   :value="entry.key"
                   @change="renameExtraSkillKey(entry.key, ($event.target as HTMLInputElement).value)"
                   :data-skill-key="entry.key"
-                  :placeholder="props.currentLang === 'es' ? 'Nombre (ej: APIs)' : 'Name (e.g. APIs)'"
+                  :placeholder="t('skillNamePlaceholder')"
                 />
                 <button class="del-btn" type="button" @click="deleteExtraSkill(entry.key)"><Trash2 :size="14" /></button>
               </div>
@@ -444,13 +443,13 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
                 v-model="cvDataLocal.skills[entry.key]"
                 rows="2"
                 class="input-field"
-                :placeholder="props.currentLang === 'es' ? 'Contenido (ej: JWT, OAuth...)' : 'Content (e.g. JWT, OAuth...)'"
+                :placeholder="t('skillContentPlaceholder')"
               ></textarea>
             </div>
           </div>
         </div>
         <div v-else class="text-xs text-gray-500">
-          {{ props.currentLang === 'es' ? 'Aún no hay habilidades. Presiona "+ Agregar habilidades".' : 'No skills yet. Click "+ Add skills".' }}
+          {{ t('noCustomSkills') }}
         </div>
       </section>
 

@@ -16,118 +16,115 @@ export const fabricioCV = {
   name: 'Fabricio Aylas Moreno',
   email: 'aylasmorenof@gmail.com',
   phone: '+51 912 404 450',
-  location: 'Lima, Peru',
+  location: 'Lima, Perú',
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
+  headline: 'Desarrollador Full Stack',
   summary:
-    'Desarrollador Full Stack. Experiencia en apps Android e iOS en producción (Flutter), APIs y microservicios (Node.js, TypeScript, Laravel y .NET) y productos web (Vue.js y Angular), en biometría, KYC, OCR, visión por computadora, sistemas empresariales y CRM. Despliegues en Google Cloud Run, Google Play y App Store. Egresado de Diseño y Desarrollo de Software (TECSUP), con grado de bachiller, y estudiante de Ingeniería de Software (USIL).',
+    'Desarrollador Full Stack con experiencia en el desarrollo y mantenimiento de aplicaciones web y móviles, APIs REST, microservicios e integraciones con inteligencia artificial. He participado en soluciones de biometría y verificación de identidad, reconocimiento óptico de caracteres (OCR), visión computacional y plataformas empresariales.\n\nTrabajo con tecnologías como Flutter, Vue.js, Angular, Node.js, TypeScript, Laravel y .NET, integrando servicios cloud, bases de datos y herramientas de control de versiones. Cuento con experiencia en despliegues en Google Cloud Run y publicación de aplicaciones en Google Play y App Store. Egresado de Diseño y Desarrollo de Software por TECSUP y estudiante de Ingeniería de Software en USIL.',
   experience: [
     {
-      company: 'Belity — Belleza a domicilio',
+      company: 'Belity — Plataforma de belleza a domicilio',
       role: 'Desarrollador Full Stack Mobile',
-      date: 'Oct 2026 - Actualidad',
-      location: 'Lima, Perú · Presencial',
+      date: 'Octubre 2026 – Actualidad',
+      location: 'Lima, Perú',
       description: [
-        'Biometría y KYC: validación facial y prueba de vida con AWS Rekognition (CompareFaces y Face Liveness).',
-        'IA y visión computacional: integración de Grok para clasificar imágenes y evaluar su calidad visual, agilizando el onboarding de profesionales.',
-        'OCR y validación documental: lectura de DNI, cédulas y pasaportes (MRZ/ICAO) con Google ML Kit, incluida la validación de documentos en PDF.',
-        'Backend y cloud: microservicios en Node.js, TypeScript y Express, desplegados en Google Cloud Run con Docker e integrados con Laravel.',
-        'Desarrollo móvil y releases: mantenimiento de la app Flutter (GetX y Firebase) y publicación de versiones en Google Play Console y App Store Connect.'
+        'Implementación de procesos de verificación de identidad mediante AWS Rekognition, incluyendo comparación facial y prueba de vida (Face Liveness).',
+        'Integración de servicios de inteligencia artificial con Grok para la clasificación y evaluación de calidad de imágenes durante el registro de profesionales.',
+        'Desarrollo de funcionalidades de OCR y validación documental para DNI, cédulas, pasaportes y documentos PDF mediante Google ML Kit.',
+        'Desarrollo e integración de microservicios con Node.js, TypeScript y Express, desplegados en Google Cloud Run mediante Docker y conectados con Laravel.',
+        'Mantenimiento y evolución de la aplicación móvil en Flutter, utilizando GetX y Firebase, y gestión de publicaciones en Google Play Console y App Store Connect.'
       ]
     },
     {
       company: 'Firefly One',
       role: 'Desarrollador Full Stack',
-      date: 'Jul 2026 - Sept 2026',
+      date: 'Julio 2026 – Septiembre 2026',
       location: 'Lima, Perú',
       description: [
-        'Desarrollo y modernización de sistemas empresariales críticos para el sector asegurador, garantizando alta disponibilidad y escalabilidad mediante arquitecturas frontend y backend robustas.',
-        'Construcción de soluciones Full Stack utilizando Vue.js y Laravel, optimizando el rendimiento de la aplicación y asegurando una integración eficiente y segura de APIs REST.',
-        'Implementación de flujos de trabajo colaborativos y revisión exhaustiva de código (Pull Requests) con Git y GitHub, elevando la calidad y mantenibilidad del software.',
-        'Gestión eficiente del ciclo de vida del desarrollo bajo metodologías ágiles, colaborando con equipos multidisciplinarios mediante Jira para cumplir con los objetivos estratégicos del negocio.'
+        'Desarrollo y modernización de sistemas empresariales para el sector asegurador mediante Vue.js y Laravel.',
+        'Implementación y consumo de APIs REST, con énfasis en la integración entre frontend y backend, la seguridad y el rendimiento.',
+        'Gestión de código mediante Git y GitHub, participando en Pull Requests y revisiones de código para mejorar la mantenibilidad.',
+        'Seguimiento de tareas y coordinación con equipos multidisciplinarios mediante Jira y metodologías ágiles.'
       ]
     },
     {
-      company: 'Syncra Connect — CRM Empresarial (Proyecto Unilene)',
+      company: 'Syncra Connect — CRM empresarial (Proyecto Unilene)',
       role: 'Desarrollador Full Stack',
-      date: 'Feb 2026 - Jun 2026',
-      location: 'Lima, Peru',
+      date: 'Febrero 2026 – Junio 2026',
+      location: 'Lima, Perú',
       description: [
-        'Desarrollo y mantenimiento de funcionalidades para CRM empresarial.',
-        'Implementación y consumo de APIs REST utilizando .NET.',
-        'Desarrollo de interfaces y componentes frontend utilizando Angular.',
-        'Participación en desarrollo de funcionalidades móviles utilizando Flutter.',
-        'Creación y mantenimiento de consultas y procedimientos en SQL Server.',
-        'Corrección de incidencias y optimización de funcionalidades existentes.',
-        'Trabajo colaborativo mediante Git y control de versiones.'
+        'Desarrollo y mantenimiento de funcionalidades para un CRM empresarial.',
+        'Implementación y consumo de APIs REST con .NET y desarrollo de interfaces con Angular.',
+        'Participación en el desarrollo de funcionalidades móviles utilizando Flutter.',
+        'Creación y optimización de consultas y procedimientos almacenados en SQL Server.',
+        'Corrección de incidencias, mantenimiento de funcionalidades existentes y control de versiones con Git.'
+      ]
+    },
+    {
+      company: 'TECSUP',
+      role: 'Desarrollador Full Stack — Proyecto académico',
+      date: 'Mayo 2025 – Septiembre 2025',
+      location: 'Lima, Perú',
+      description: [
+        'Desarrollo de un sistema web para la gestión de inventario químico de un laboratorio académico.',
+        'Implementación de operaciones CRUD, control de existencias y generación de reportes automatizados.',
+        'Desarrollo del backend con Laravel y gestión de datos mediante SQLite.',
+        'Documentación técnica y desarrollo iterativo bajo una metodología ágil.'
       ]
     },
     {
       company: 'Cimark Comunicación Corporativa S.A.C.',
       role: 'Desarrollador Full Stack',
-      date: 'Feb 2024 - Ene 2025',
+      date: 'Febrero 2024 – Enero 2025',
       location: 'Lima, Perú',
       description: [
-        'Diseño y mejora de interfaces web enfocadas en experiencia de usuario (UX/UI).',
-        'Propuesta e implementación de mejoras visuales y funcionales basadas en análisis de otras plataformas.',
-        'Adaptación de diseños a distintos dispositivos (responsive design).',
-        'Optimización de navegación, estructura y usabilidad del sitio web.',
-        'Colaboración con equipo interno para alinear diseño con objetivos del negocio.',
-        'Análisis de sitios web del sector para proponer mejoras competitivas.'
-      ]
-    },
-    {
-      company: 'TECSUP',
-      role: 'Desarrollador Full Stack',
-      date: 'May 2025 - Sept 2025',
-      location: 'Lima, Peru',
-      description: [
-        'Desarrollo de un sistema web de inventario químico para laboratorio académico.',
-        'Implementación del backend utilizando Laravel y gestión de datos con SQLite.',
-        'Desarrollo de funcionalidades CRUD, reportes automatizados y control de inventarios.',
-        'Trabajo bajo metodología ágil y elaboración de documentación técnica del sistema.'
+        'Desarrollo y mejora de interfaces web con enfoque en experiencia de usuario (UX/UI) y diseño adaptable.',
+        'Implementación de mejoras visuales y funcionales a partir del análisis de plataformas del sector.',
+        'Optimización de la navegación, estructura y usabilidad de sitios web.',
+        'Colaboración con el equipo interno para alinear las soluciones de interfaz con los objetivos del negocio.'
       ]
     }
   ],
   projects: [
     {
-      name: 'ULenguage — Traducción cultural quechua',
-      description: 'App móvil para turistas en Cusco que traduce entre quechua, español e inglés. Reconoce texto desde una foto, traduce en el momento y explica el contexto cultural con inteligencia artificial. Incluye la aplicación, el backend, las APIs y la base de datos.',
-      tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, Swagger'
+      name: 'ULenguage — Aplicación de traducción cultural quechua',
+      description: 'Aplicación móvil orientada a turistas en Cusco que facilita la traducción entre quechua, español e inglés. Incorpora reconocimiento de texto desde imágenes, traducción y asistencia con inteligencia artificial para contextualizar expresiones culturales.',
+      tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js y Swagger'
     },
     {
-      name: 'SaveBot — Respaldo de imágenes por Telegram',
-      description: 'Plataforma web conectada a un bot de Telegram para respaldar y enviar imágenes. El usuario carga los archivos en la web y el bot se encarga de distribuirlos.',
-      tech: 'JavaScript, Node.js, Telegram Bot API, APIs REST, HTML, CSS, Git'
+      name: 'SaveBot — Plataforma de respaldo de imágenes mediante Telegram',
+      description: 'Aplicación web integrada con un bot de Telegram para gestionar y distribuir imágenes a través de una interfaz web y servicios de mensajería.',
+      tech: 'JavaScript, Node.js, Telegram Bot API, APIs REST, HTML, CSS y Git'
     },
     {
-      name: 'PostulaFácil — Editor de currículums',
-      description: 'Aplicación web para crear, editar y exportar currículums en el navegador, con vista previa en tiempo real y los datos guardados en el dispositivo.',
-      tech: 'Vue.js 3, TypeScript, TailwindCSS, JSON, PDF'
+      name: 'PostulaFácil — Editor web de currículums',
+      description: 'Aplicación web para crear, editar y exportar currículums, con vista previa en tiempo real y almacenamiento local de la información del usuario.',
+      tech: 'Vue.js 3, TypeScript, Tailwind CSS, JSON y generación de PDF'
     }
   ],
   education: [
     { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Ingeniería de Software', date: '2026 – Actualidad', location: 'Lima, Perú' },
-    { school: 'TECSUP', degree: 'Diseño y Desarrollo de Software — Egresado, grado de bachiller', date: '2023 – 2025', location: 'Lima, Perú' }
+    { school: 'TECSUP', degree: 'Diseño y Desarrollo de Software — Egresado · Grado de bachiller', date: '2023 – 2025', location: 'Lima, Perú' }
   ],
   certifications: [
-    'Scrum Fundamentals Certified – SCRUMstudy',
-    'Fundamentos de Ciberseguridad – Cisco',
-    'Hackathon Becas BCP 2025 – Participante',
-    'Hackathon TECSUP 2024 – Equipo seleccionado',
-    'Training Camp CPC – UTEC'
+    'Scrum Fundamentals Certified — SCRUMstudy',
+    'Fundamentos de Ciberseguridad — Cisco',
+    'Participante — Hackathon Becas BCP 2025',
+    'Equipo seleccionado — Hackathon TECSUP 2024',
+    'Training Camp CPC — UTEC'
   ],
   skills: {
-    frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
-    backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, APIs REST, JWT, Swagger',
-    db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
-    mobile: 'Flutter, Dart, GetX, Firebase, Kotlin',
-    tools: 'Linux, Git, GitHub, Docker, Postman, Swagger',
-    cloudAi: 'AWS Rekognition, Google ML Kit, Grok, Google Cloud Run, Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
+    frontend: 'Vue.js, Angular, React, Next.js, JavaScript, TypeScript, HTML5, CSS3, Bootstrap y Tailwind CSS',
+    backend: 'Node.js, Express.js, PHP, Laravel, C#, .NET, APIs REST, JWT y Swagger',
+    mobile: 'Flutter, Dart, GetX, Firebase y Kotlin',
+    db: 'SQL Server, MySQL, PostgreSQL, MongoDB y SQLite',
+    cloudAi: 'Google Cloud Run, Docker, AWS Rekognition, Google ML Kit, Google Vision API, Google Gemini AI, Grok, OCR y Telegram Bot API',
+    tools: 'Git, GitHub, Linux, Postman y Jira',
     languages: ''
   },
   fileName: 'CV_Principal_Fabricio',
-  meta: { settings: { ...defaultSettings }, contentRevision: 3 }
+  meta: { settings: { ...defaultSettings }, contentRevision: 9 }
 }
 
 export const fabricioCV_en = {
@@ -137,114 +134,111 @@ export const fabricioCV_en = {
   location: 'Lima, Peru',
   linkedin: 'https://www.linkedin.com/in/fabricio-aylas/',
   github: '',
-  summary: 'Full Stack developer. Experience shipping Android and iOS apps (Flutter), APIs and microservices (Node.js, TypeScript, Laravel, and .NET), and web products (Vue.js and Angular), across biometrics, KYC, OCR, computer vision, enterprise systems, and CRM. Deployments on Google Cloud Run, Google Play, and the App Store. Software Design and Development graduate (TECSUP), with a bachelor\'s degree, and a Software Engineering student (USIL).',
+  headline: 'Full Stack Developer',
+  summary: 'Full Stack developer with experience building and maintaining web and mobile applications, REST APIs, microservices, and artificial intelligence integrations. I have contributed to biometrics and identity verification, optical character recognition (OCR), computer vision, and enterprise platforms.\n\nI work with Flutter, Vue.js, Angular, Node.js, TypeScript, Laravel, and .NET, integrating cloud services, databases, and version control. I deploy on Google Cloud Run and publish applications on Google Play and the App Store. Software Design and Development graduate from TECSUP, and a Software Engineering student at USIL.',
   experience: [
     {
-      company: 'Belity — Belleza a domicilio',
+      company: 'Belity — At-home beauty platform',
       role: 'Full Stack Mobile Developer',
-      date: 'Oct 2026 - Present',
-      location: 'Lima, Peru · On-site',
+      date: 'October 2026 – Present',
+      location: 'Lima, Peru',
       description: [
-        'Biometrics and KYC: face matching and liveness checks with AWS Rekognition (CompareFaces and Face Liveness).',
-        'AI and computer vision: Grok integration to classify images and score visual quality, speeding up professional onboarding.',
-        'OCR and document validation: reading of national IDs and passports (MRZ/ICAO) with Google ML Kit, including PDF document checks.',
-        'Backend and cloud: microservices in Node.js, TypeScript, and Express, deployed on Google Cloud Run with Docker and integrated with Laravel.',
-        'Mobile development and releases: maintenance of the Flutter app (GetX and Firebase) and publishing in Google Play Console and App Store Connect.'
+        'Implemented identity verification with AWS Rekognition, including face comparison and liveness checks (Face Liveness).',
+        'Integrated Grok to classify images and assess visual quality during professional onboarding.',
+        'Built OCR and document validation for national IDs, passports, and PDF documents with Google ML Kit.',
+        'Built and integrated microservices in Node.js, TypeScript, and Express, deployed on Google Cloud Run with Docker and connected to Laravel.',
+        'Maintained and evolved the Flutter mobile app (GetX and Firebase), and managed releases in Google Play Console and App Store Connect.'
       ]
     },
     {
       company: 'Firefly One',
       role: 'Full Stack Developer',
-      date: 'Jul 2026 - Sept 2026',
+      date: 'July 2026 – September 2026',
       location: 'Lima, Peru',
       description: [
-        'Development and modernization of critical enterprise systems for the insurance sector, ensuring high availability and scalability through robust frontend and backend architectures.',
-        'Built Full Stack solutions using Vue.js and Laravel, optimizing application performance and ensuring efficient and secure REST API integration.',
-        'Implemented collaborative workflows and comprehensive code reviews (Pull Requests) with Git and GitHub, elevating software quality and maintainability.',
-        'Efficiently managed the development lifecycle under agile methodologies, collaborating with multidisciplinary teams using Jira to meet strategic business objectives.'
+        'Developed and modernized enterprise systems for the insurance sector with Vue.js and Laravel.',
+        'Implemented and consumed REST APIs, with attention to frontend–backend integration, security, and performance.',
+        'Managed code with Git and GitHub, including pull requests and code reviews to improve maintainability.',
+        'Tracked work and coordinated with multidisciplinary teams using Jira and agile methods.'
       ]
     },
     {
       company: 'Syncra Connect — Enterprise CRM (Unilene Project)',
       role: 'Full Stack Developer',
-      date: 'Feb 2026 - Jun 2026',
+      date: 'February 2026 – June 2026',
       location: 'Lima, Peru',
       description: [
-        'Development and maintenance of features for an enterprise CRM.',
-        'Implementation and consumption of REST APIs using .NET.',
-        'Developed frontend interfaces and components using Angular.',
-        'Participated in the development of mobile features using Flutter.',
-        'Created and maintained queries and procedures in SQL Server.',
-        'Resolved issues and optimized existing features.',
-        'Collaborative work using Git and version control.'
+        'Developed and maintained features for an enterprise CRM.',
+        'Implemented and consumed REST APIs with .NET and built interfaces with Angular.',
+        'Contributed to mobile features with Flutter.',
+        'Created and optimized SQL Server queries and stored procedures.',
+        'Fixed incidents, maintained existing features, and used Git for version control.'
+      ]
+    },
+    {
+      company: 'TECSUP',
+      role: 'Full Stack Developer — Academic project',
+      date: 'May 2025 – September 2025',
+      location: 'Lima, Peru',
+      description: [
+        'Built a web system to manage chemical inventory for an academic laboratory.',
+        'Implemented CRUD operations, stock control, and automated reports.',
+        'Developed the backend with Laravel and stored data in SQLite.',
+        'Wrote technical documentation and worked iteratively under an agile method.'
       ]
     },
     {
       company: 'Cimark Comunicación Corporativa S.A.C.',
       role: 'Full Stack Developer',
-      date: 'Feb 2024 - Jan 2025',
+      date: 'February 2024 – January 2025',
       location: 'Lima, Peru',
       description: [
-        'Designed and improved web interfaces focused on user experience (UX/UI).',
-        'Proposed and implemented visual and functional improvements based on the analysis of other platforms.',
-        'Adapted designs to different devices (responsive design).',
-        'Optimized navigation, structure, and usability of the website.',
-        'Collaborated with the internal team to align design with business objectives.',
-        'Analyzed sector websites to propose competitive improvements.'
-      ]
-    },
-    {
-      company: 'TECSUP',
-      role: 'Full Stack Developer',
-      date: 'May 2025 - Sept 2025',
-      location: 'Lima, Peru',
-      description: [
-        'Developed a web chemical inventory system for an academic laboratory.',
-        'Implemented the backend using Laravel and managed data with SQLite.',
-        'Developed CRUD features, automated reports, and inventory control.',
-        'Worked under agile methodology and created technical system documentation.'
+        'Built and improved web interfaces focused on user experience (UX/UI) and responsive layout.',
+        'Implemented visual and functional improvements based on analysis of platforms in the sector.',
+        'Improved site navigation, structure, and usability.',
+        'Worked with the internal team to align interface work with business goals.'
       ]
     }
   ],
   projects: [
     {
-      name: 'ULenguage — Quechua cultural translation',
-      description: 'Mobile app for tourists in Cusco that translates between Quechua, Spanish, and English. It reads text from a photo, translates it on the spot, and explains the cultural context with AI. Includes the app, backend, APIs, and database.',
-      tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, Swagger'
+      name: 'ULenguage — Quechua cultural translation app',
+      description: 'Mobile app for tourists in Cusco that translates between Quechua, Spanish, and English. It recognizes text from images, translates it, and uses artificial intelligence to explain cultural expressions.',
+      tech: 'Flutter, Dart, Node.js, Express.js, MongoDB, JWT, Google Vision API, Gemini AI, Google Translate API, Tesseract.js, and Swagger'
     },
     {
-      name: 'SaveBot — Image backup via Telegram',
-      description: 'Web platform connected to a Telegram bot for backing up and sending images. Users upload files on the web and the bot handles distribution.',
-      tech: 'JavaScript, Node.js, Telegram Bot API, REST APIs, HTML, CSS, Git'
+      name: 'SaveBot — Image backup platform via Telegram',
+      description: 'Web application integrated with a Telegram bot to manage and distribute images through a web interface and messaging services.',
+      tech: 'JavaScript, Node.js, Telegram Bot API, REST APIs, HTML, CSS, and Git'
     },
     {
-      name: 'PostulaFácil — Resume editor',
-      description: 'Web app to create, edit, and export resumes in the browser, with a live preview and data stored on the device.',
-      tech: 'Vue.js 3, TypeScript, TailwindCSS, JSON, PDF'
+      name: 'PostulaFácil — Web resume editor',
+      description: 'Web application to create, edit, and export resumes, with a live preview and local storage of the user\'s information.',
+      tech: 'Vue.js 3, TypeScript, Tailwind CSS, JSON, and PDF generation'
     }
   ],
   education: [
     { school: 'Universidad San Ignacio de Loyola (USIL)', degree: 'Software Engineering', date: '2026 – Present', location: 'Lima, Peru' },
-    { school: 'TECSUP', degree: 'Software Design and Development — Graduate, bachelor\'s degree', date: '2023 – 2025', location: 'Lima, Peru' }
+    { school: 'TECSUP', degree: 'Software Design and Development — Graduate · Bachelor\'s degree', date: '2023 – 2025', location: 'Lima, Peru' }
   ],
   certifications: [
-    'Scrum Fundamentals Certified – SCRUMstudy',
-    'Cybersecurity Fundamentals – Cisco',
-    'Hackathon Becas BCP 2025 – Participant',
-    'Hackathon TECSUP 2024 – Selected team',
-    'Training Camp CPC – UTEC'
+    'Scrum Fundamentals Certified — SCRUMstudy',
+    'Cybersecurity Fundamentals — Cisco',
+    'Participant — Hackathon Becas BCP 2025',
+    'Selected team — Hackathon TECSUP 2024',
+    'Training Camp CPC — UTEC'
   ],
   skills: {
-    frontend: 'HTML, CSS, Bootstrap, TailwindCSS, JavaScript, TypeScript, React, Angular, Vue.js, Next.js',
-    backend: 'Node.js, Express.js, PHP, C#, .NET, Laravel, REST APIs, JWT, Swagger',
-    db: 'MySQL, PostgreSQL, SQL Server, MongoDB, SQLite',
-    mobile: 'Flutter, Dart, GetX, Firebase, Kotlin',
-    tools: 'Linux, Git, GitHub, Docker, Postman, Swagger',
-    cloudAi: 'AWS Rekognition, Google ML Kit, Grok, Google Cloud Run, Google Gemini AI, Google Vision API, OCR, Telegram Bot API',
+    frontend: 'Vue.js, Angular, React, Next.js, JavaScript, TypeScript, HTML5, CSS3, Bootstrap, and Tailwind CSS',
+    backend: 'Node.js, Express.js, PHP, Laravel, C#, .NET, REST APIs, JWT, and Swagger',
+    mobile: 'Flutter, Dart, GetX, Firebase, and Kotlin',
+    db: 'SQL Server, MySQL, PostgreSQL, MongoDB, and SQLite',
+    cloudAi: 'Google Cloud Run, Docker, AWS Rekognition, Google ML Kit, Google Vision API, Google Gemini AI, Grok, OCR, and Telegram Bot API',
+    tools: 'Git, GitHub, Linux, Postman, and Jira',
     languages: 'Spanish (Native), English'
   },
   fileName: 'CV_Main_Fabricio_EN',
-  meta: { settings: { ...defaultSettings }, contentRevision: 3 }
+  meta: { settings: { ...defaultSettings }, contentRevision: 9 }
 }
 
 export const normalizeCv = (cv: any) => {
@@ -252,6 +246,7 @@ export const normalizeCv = (cv: any) => {
   if ('title' in cv) delete cv.title
 
   cv.name ??= ''
+  cv.headline ??= ''
   cv.email ??= ''
   cv.phone ??= ''
   cv.location ??= ''
@@ -317,7 +312,7 @@ export const normalizeCv = (cv: any) => {
   return cv
 }
 
-export const PROFILE_REVISION = 3
+export const PROFILE_REVISION = 9
 
 export function createEmptyCv(fileName: string) {
   return normalizeCv({
@@ -327,6 +322,7 @@ export function createEmptyCv(fileName: string) {
     location: '',
     linkedin: '',
     github: '',
+    headline: '',
     summary: '',
     experience: [],
     projects: [],
@@ -338,13 +334,15 @@ export function createEmptyCv(fileName: string) {
   })
 }
 
-const OLD_MOBILE = 'Flutter, Dart, Kotlin'
-const OLD_TOOLS = 'Linux, Git, GitHub, Postman, Swagger'
-const OLD_CLOUD = 'Google Gemini AI, Google Vision API, OCR, Telegram Bot API'
-
 export function applyProfileRevision(cv: any) {
   if (!cv || cv.name !== 'Fabricio Aylas Moreno') return cv
-  if ((cv.meta?.contentRevision ?? 0) >= PROFILE_REVISION) return cv
+  const summary = String(cv.summary || '')
+  const staleSummary =
+    summary.startsWith('Desarrollador Full Stack, con experiencia') ||
+    summary.startsWith('Desarrollador Full Stack. Experiencia en apps') ||
+    summary.startsWith('Full Stack developer, with experience') ||
+    summary.startsWith('Full Stack developer. Experience shipping')
+  if ((cv.meta?.contentRevision ?? 0) >= PROFILE_REVISION && !staleSummary) return cv
 
   const belityRole = String(
     cv.experience?.find((e: any) => String(e?.company || '').includes('Belity'))?.role || ''
@@ -355,26 +353,14 @@ export function applyProfileRevision(cv: any) {
     belityRole.includes('Developer')
 
   const base = isEn ? fabricioCV_en : fabricioCV
+  cv.headline = base.headline
+  cv.location = base.location
   cv.summary = base.summary
+  cv.experience = JSON.parse(JSON.stringify(base.experience))
   cv.projects = JSON.parse(JSON.stringify(base.projects))
-
-  if (Array.isArray(cv.education)) {
-    const baseTecsup = base.education.find((e: any) => String(e?.school || '').includes('TECSUP'))
-    const localTecsup = cv.education.find((e: any) => String(e?.school || '').includes('TECSUP'))
-    if (baseTecsup && localTecsup) localTecsup.degree = baseTecsup.degree
-  }
-
-  const belity = JSON.parse(JSON.stringify(base.experience[0]))
-  if (!Array.isArray(cv.experience)) cv.experience = []
-  const idx = cv.experience.findIndex((e: any) => String(e?.company || '').includes('Belity'))
-  if (idx >= 0) cv.experience[idx] = belity
-  else cv.experience.unshift(belity)
-
-  if (cv.skills && typeof cv.skills === 'object' && !Array.isArray(cv.skills)) {
-    if (cv.skills.mobile === OLD_MOBILE) cv.skills.mobile = base.skills.mobile
-    if (cv.skills.tools === OLD_TOOLS) cv.skills.tools = base.skills.tools
-    if (cv.skills.cloudAi === OLD_CLOUD) cv.skills.cloudAi = base.skills.cloudAi
-  }
+  cv.education = JSON.parse(JSON.stringify(base.education))
+  cv.certifications = JSON.parse(JSON.stringify(base.certifications))
+  cv.skills = JSON.parse(JSON.stringify(base.skills))
 
   if (!cv.meta) cv.meta = {}
   cv.meta.contentRevision = PROFILE_REVISION

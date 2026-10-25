@@ -28,7 +28,9 @@ export const useCvStore = defineStore(
       if (!cvList.value || cvList.value.length === 0) {
         cvList.value = [normalizeCv(JSON.parse(JSON.stringify(fabricioCV)))]
       } else {
-        cvList.value = cvList.value.map(cv => applyProfileRevision(normalizeCv(cv)))
+        cvList.value = cvList.value.map(cv =>
+          JSON.parse(JSON.stringify(applyProfileRevision(normalizeCv(cv))))
+        )
       }
     }
 

@@ -33,6 +33,18 @@ const pageStyle = computed<Record<string, string | number>>(() => {
 
 const contentId = computed(() => (props.exportMode ? 'resume-preview-content' : undefined))
 
+const linkLabel = (value: string) => {
+  const raw = String(value || '').trim()
+  if (!raw) return ''
+  try {
+    const url = new URL(raw.includes('://') ? raw : `https://${raw}`)
+    const host = url.hostname.replace(/^www\./, '')
+    return `${host}${url.pathname.replace(/\/$/, '')}`
+  } catch {
+    return raw
+  }
+}
+
 const fixedSkillLabelKeys: Record<string, string> = {
   frontend: 'skillsFrontend',
   backend: 'skillsBackend',
@@ -63,37 +75,36 @@ const skillsEntries = computed(() => {
   <div id="resume-preview" class="w-full flex justify-center">
     <div class="resume-page-wrap">
       <div :id="contentId" class="resume-page" :style="pageStyle">
-        <header class="mb-6 text-center border-b pb-4" :style="{ borderColor: props.settings.themeColor }">
-          <h1 class="uppercase tracking-wider font-bold mb-2 leading-none text-black">
-            {{ cvData.name }}
-          </h1>
-
-          <div class="flex justify-center flex-wrap gap-x-4 gap-y-1 text-gray-700 contact-info">
-            <span v-if="cvData.location" class="flex items-center gap-1"><MapPin :size="12" /> {{ cvData.location }}</span>
-            <span v-if="cvData.phone" class="flex items-center gap-1"><Phone :size="12" /> {{ cvData.phone }}</span>
-            <span v-if="cvData.email" class="flex items-center gap-1"><Mail :size="12" /> {{ cvData.email }}</span>
-            <span v-if="cvData.linkedin" class="flex items-center gap-1"><Linkedin :size="12" /> LinkedIn</span>
-            <span v-if="cvData.github" class="flex items-center gap-1"><Github :size="12" /> GitHub</span>
+        <header class="resume-header text-center">
+          <h1 class="resume-name">{{ cvData.name }}</h1>
+          <p v-if="cvData.headline" class="resume-headline">{{ cvData.headline }}</p>
+          <div class="contact-info">
+            <span v-if="cvData.location" class="contact-item"><MapPin :size="11" /> {{ cvData.location }}</span>
+            <span v-if="cvData.phone" class="contact-item"><Phone :size="11" /> {{ cvData.phone }}</span>
+            <span v-if="cvData.email" class="contact-item"><Mail :size="11" /> {{ cvData.email }}</span>
+            <span v-if="cvData.linkedin" class="contact-item"><Linkedin :size="11" /> {{ linkLabel(cvData.linkedin) }}</span>
+            <span v-if="cvData.github" class="contact-item"><Github :size="11" /> {{ linkLabel(cvData.github) }}</span>
           </div>
         </header>
 
         <section v-if="cvData.summary" class="section-block">
-          <p class="text-justify leading-relaxed whitespace-pre-line">{{ cvData.summary }}</p>
+          <h2 class="section-title">{{ t('cv_profileTitle') }}</h2>
+          <p class="profile-text">{{ cvData.summary }}</p>
         </section>
 
         <section v-if="cvData.experience?.length" class="section-block">
           <h2 class="section-title">{{ t('cv_experienceTitle') || 'Experiencia' }}</h2>
-          <div v-for="(job, i) in cvData.experience" :key="i" class="mb-4">
-            <div class="flex justify-between font-bold">
-              <span>{{ job.company }}</span>
-              <span>{{ job.location }}</span>
+          <div v-for="(job, i) in cvData.experience" :key="i" class="entry">
+            <div class="entry-row font-bold">
+              <span class="entry-main">{{ job.company }}</span>
+              <span v-if="job.location" class="entry-aside">{{ job.location }}</span>
             </div>
-            <div class="flex justify-between italic mb-1">
-              <span>{{ job.role }}</span>
-              <span>{{ job.date }}</span>
+            <div class="entry-row italic">
+              <span class="entry-main">{{ job.role }}</span>
+              <span v-if="job.date" class="entry-aside">{{ job.date }}</span>
             </div>
 
-            <ul v-if="Array.isArray(job.description)" class="list-disc ml-5">
+            <ul v-if="Array.isArray(job.description)" class="entry-list list-disc ml-5">
               <li v-for="(desc, j) in job.description" :key="j" class="text-justify">{{ desc }}</li>
             </ul>
             <p v-else class="text-justify whitespace-pre-line">{{ job.description }}</p>
@@ -102,10 +113,10 @@ const skillsEntries = computed(() => {
 
         <section v-if="cvData.projects?.length" class="section-block">
           <h2 class="section-title">{{ t('cv_projectsTitle') || 'Proyectos Relevantes' }}</h2>
-          <div v-for="(proj, i) in cvData.projects" :key="i" class="mb-4">
-            <div class="font-bold">{{ proj.name }}</div>
-            <p class="text-justify">{{ proj.description }}</p>
-            <p v-if="proj.tech" class="mt-1">
+          <div v-for="(proj, i) in cvData.projects" :key="i" class="entry">
+            <div class="font-bold entry-title">{{ proj.name }}</div>
+            <p class="text-justify entry-body">{{ proj.description }}</p>
+            <p v-if="proj.tech" class="entry-meta">
               <strong>{{ t('cv_technologies') || 'Tecnologías' }}:</strong> {{ proj.tech }}
             </p>
           </div>
@@ -113,14 +124,14 @@ const skillsEntries = computed(() => {
 
         <section v-if="cvData.education?.length" class="section-block">
           <h2 class="section-title">{{ t('cv_educationTitle') || 'Educación' }}</h2>
-          <div v-for="(edu, i) in cvData.education" :key="i" class="mb-2">
-            <div class="flex justify-between font-bold">
-              <span>{{ edu.school }}</span>
-              <span>{{ edu.location }}</span>
+          <div v-for="(edu, i) in cvData.education" :key="i" class="entry">
+            <div class="entry-row font-bold">
+              <span class="entry-main">{{ edu.school }}</span>
+              <span v-if="edu.location" class="entry-aside">{{ edu.location }}</span>
             </div>
-            <div class="flex justify-between italic">
-              <span>{{ edu.degree }}</span>
-              <span>{{ edu.date }}</span>
+            <div class="entry-row italic">
+              <span class="entry-main">{{ edu.degree }}</span>
+              <span v-if="edu.date" class="entry-aside">{{ edu.date }}</span>
             </div>
           </div>
         </section>
@@ -159,19 +170,92 @@ const skillsEntries = computed(() => {
   line-height: var(--line-spacing, 1.4);
 }
 
-h1 { font-size: 24pt; }
+.resume-header {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--theme-color);
+}
+
+.resume-name {
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  margin: 0;
+  color: #111;
+}
+
+.resume-headline {
+  margin: 6px 0 8px;
+  font-size: 11.5pt;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #222;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.92em;
+  color: #333;
+}
+
+.contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-text {
+  margin: 0;
+  text-align: justify;
+  white-space: pre-line;
+  line-height: 1.45;
+}
 
 .section-title {
   font-size: 1.15em;
   font-weight: bold;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--theme-color);
   border-bottom: 1.5px solid var(--theme-color);
-  margin-bottom: 8px;
-  padding-bottom: 2px;
+  margin-bottom: 12px;
+  padding-bottom: 4px;
 }
 
-.section-block { margin-bottom: var(--paragraph-spacing); }
+.section-block { margin-bottom: calc(var(--paragraph-spacing) + 10px); }
+
+.entry { margin-bottom: 14px; }
+
+.entry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+}
+
+.entry-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 12px;
+}
+
+.entry-aside {
+  flex: 0 0 auto;
+  margin-left: 16px;
+  white-space: nowrap;
+}
+
+.entry-title { margin-bottom: 4px; }
+.entry-body { margin-top: 2px; }
+.entry-meta { margin-top: 6px; }
+
+.entry-list { margin-top: 6px; }
+.entry-list li + li { margin-top: 4px; }
 
 @media print {
   .resume-page { box-shadow: none !important; }

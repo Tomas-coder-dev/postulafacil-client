@@ -214,8 +214,12 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
           <input v-model="cvDataLocal.name" class="input-field" />
         </div>
         <div>
+          <label class="label">{{ t('professionalTitle') }}</label>
+          <input v-model="cvDataLocal.headline" class="input-field" />
+        </div>
+        <div>
           <label class="label">{{ t('summaryLabel') }}</label>
-          <textarea v-model="cvDataLocal.summary" rows="4" class="input-field"></textarea>
+          <textarea v-model="cvDataLocal.summary" rows="6" class="input-field"></textarea>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -277,7 +281,13 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
             <div class="grid grid-cols-1 gap-2 mb-2">
               <input v-model="job.location" class="input-sm" :placeholder="t('jobLocationPlaceholder')" />
             </div>
-            <textarea v-model="job.description" rows="3" class="input-sm w-full border rounded p-1 bg-white dark:bg-gray-900" :placeholder="t('jobDescriptionPlaceholder')"></textarea>
+            <textarea
+              :value="Array.isArray(job.description) ? job.description.join('\n') : (job.description || '')"
+              @input="job.description = ($event.target as HTMLTextAreaElement).value.split('\n')"
+              rows="5"
+              class="input-sm w-full border rounded p-1 bg-white dark:bg-gray-900"
+              :placeholder="t('jobDescriptionPlaceholder')"
+            ></textarea>
           </div>
         </TransitionGroup>
       </section>
@@ -405,20 +415,20 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
             <input v-model="cvDataLocal.skills.backend" class="input-field" />
           </div>
           <div>
-            <label class="label">{{ t('skillsDB') }}</label>
-            <input v-model="cvDataLocal.skills.db" class="input-field" />
-          </div>
-          <div>
             <label class="label">{{ t('skillsMobile') }}</label>
             <input v-model="cvDataLocal.skills.mobile" class="input-field" />
           </div>
           <div>
-            <label class="label">{{ t('skillsTools') }}</label>
-            <input v-model="cvDataLocal.skills.tools" class="input-field" />
+            <label class="label">{{ t('skillsDB') }}</label>
+            <input v-model="cvDataLocal.skills.db" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsCloudAi') }}</label>
             <input v-model="cvDataLocal.skills.cloudAi" class="input-field" />
+          </div>
+          <div>
+            <label class="label">{{ t('skillsTools') }}</label>
+            <input v-model="cvDataLocal.skills.tools" class="input-field" />
           </div>
           <div>
             <label class="label">{{ t('skillsLanguages') }}</label>

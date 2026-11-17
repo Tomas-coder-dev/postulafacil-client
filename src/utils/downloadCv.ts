@@ -71,7 +71,7 @@ export async function downloadResumePdf(source: HTMLElement, filename: string, p
       format: paperSize === 'Letter' ? 'letter' : 'a4',
       orientation: 'portrait' as const
     },
-    pagebreak: { mode: ['css', 'legacy'], avoid: ['.keep'] }
+    pagebreak: { mode: ['css', 'legacy'], avoid: ['.entry', '.section-title', '.resume-header', '.skill-line', '.profile-text'] }
   }
 
   try {

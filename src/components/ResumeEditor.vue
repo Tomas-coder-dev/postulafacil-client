@@ -369,7 +369,7 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         </div>
         <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 relative">
           <div
-            v-for="(cert, index) in (cvDataLocal.certifications || [])"
+            v-for="index in [...(cvDataLocal.certifications || []).keys()]"
             :key="index"
             class="flex gap-2 items-center transition-all bg-white dark:bg-gray-800"
             :class="{

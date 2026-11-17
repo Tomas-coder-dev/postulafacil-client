@@ -33,6 +33,11 @@ const pageStyle = computed<Record<string, string | number>>(() => {
 
 const contentId = computed(() => (props.exportMode ? 'resume-preview-content' : undefined))
 
+const filledLines = (lines: unknown): string[] => {
+  if (!Array.isArray(lines)) return []
+  return lines.map((line) => String(line ?? '').trim()).filter((line) => line.length > 0)
+}
+
 const linkLabel = (value: string) => {
   const raw = String(value || '').trim()
   if (!raw) return ''
@@ -105,7 +110,7 @@ const skillsEntries = computed(() => {
             </div>
 
             <ul v-if="Array.isArray(job.description)" class="entry-list list-disc ml-5">
-              <li v-for="(desc, j) in job.description.filter((line) => String(line || '').trim())" :key="j" class="keep text-justify">{{ desc }}</li>
+              <li v-for="(desc, j) in filledLines(job.description)" :key="j" class="keep text-justify">{{ desc }}</li>
             </ul>
             <p v-else class="text-justify whitespace-pre-line">{{ job.description }}</p>
           </div>

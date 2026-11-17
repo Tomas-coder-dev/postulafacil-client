@@ -1,5 +1,11 @@
 import html2pdf from 'html2pdf.js'
 
+type PdfWorker = {
+  set: (options: object) => PdfWorker
+  from: (element: HTMLElement) => PdfWorker
+  save: () => Promise<void>
+}
+
 export function safeFileName(name: string, extension: string) {
   const ext = extension.startsWith('.') ? extension : `.${extension}`
   const base = String(name || 'CV')
@@ -69,7 +75,8 @@ export async function downloadResumePdf(source: HTMLElement, filename: string, p
   }
 
   try {
-    await html2pdf().set(opt as Parameters<ReturnType<typeof html2pdf>['set']>[0]).from(clone).save()
+    const worker = (html2pdf as unknown as () => PdfWorker)()
+    await worker.set(opt).from(clone).save()
   } finally {
     host.remove()
   }

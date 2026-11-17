@@ -75,7 +75,7 @@ const skillsEntries = computed(() => {
   <div id="resume-preview" class="w-full flex justify-center">
     <div class="resume-page-wrap">
       <div :id="contentId" class="resume-page" :style="pageStyle">
-        <header class="resume-header text-center">
+        <header class="resume-header keep text-center">
           <h1 class="resume-name">{{ cvData.name }}</h1>
           <p v-if="cvData.headline" class="resume-headline">{{ cvData.headline }}</p>
           <div class="contact-info">
@@ -88,32 +88,32 @@ const skillsEntries = computed(() => {
         </header>
 
         <section v-if="cvData.summary" class="section-block">
-          <h2 class="section-title">{{ t('cv_profileTitle') }}</h2>
-          <p class="profile-text">{{ cvData.summary }}</p>
+          <h2 class="section-title keep">{{ t('cv_profileTitle') }}</h2>
+          <p class="profile-text keep">{{ cvData.summary }}</p>
         </section>
 
         <section v-if="cvData.experience?.length" class="section-block">
-          <h2 class="section-title">{{ t('cv_experienceTitle') || 'Experiencia' }}</h2>
-          <div v-for="(job, i) in cvData.experience" :key="i" class="entry">
-            <div class="entry-row font-bold">
+          <h2 class="section-title keep">{{ t('cv_experienceTitle') || 'Experiencia' }}</h2>
+          <div v-for="(job, i) in cvData.experience" :key="i" class="entry keep">
+            <div class="entry-row keep font-bold">
               <span class="entry-main">{{ job.company }}</span>
               <span v-if="job.location" class="entry-aside">{{ job.location }}</span>
             </div>
-            <div class="entry-row italic">
+            <div class="entry-row keep italic">
               <span class="entry-main">{{ job.role }}</span>
               <span v-if="job.date" class="entry-aside">{{ job.date }}</span>
             </div>
 
             <ul v-if="Array.isArray(job.description)" class="entry-list list-disc ml-5">
-              <li v-for="(desc, j) in job.description" :key="j" class="text-justify">{{ desc }}</li>
+              <li v-for="(desc, j) in job.description.filter((line) => String(line || '').trim())" :key="j" class="keep text-justify">{{ desc }}</li>
             </ul>
             <p v-else class="text-justify whitespace-pre-line">{{ job.description }}</p>
           </div>
         </section>
 
         <section v-if="cvData.projects?.length" class="section-block">
-          <h2 class="section-title">{{ t('cv_projectsTitle') || 'Proyectos Relevantes' }}</h2>
-          <div v-for="(proj, i) in cvData.projects" :key="i" class="entry">
+          <h2 class="section-title keep">{{ t('cv_projectsTitle') || 'Proyectos Relevantes' }}</h2>
+          <div v-for="(proj, i) in cvData.projects" :key="i" class="entry keep">
             <div class="font-bold entry-title">{{ proj.name }}</div>
             <p class="text-justify entry-body">{{ proj.description }}</p>
             <p v-if="proj.tech" class="entry-meta">
@@ -123,13 +123,13 @@ const skillsEntries = computed(() => {
         </section>
 
         <section v-if="cvData.education?.length" class="section-block">
-          <h2 class="section-title">{{ t('cv_educationTitle') || 'Educación' }}</h2>
-          <div v-for="(edu, i) in cvData.education" :key="i" class="entry">
-            <div class="entry-row font-bold">
+          <h2 class="section-title keep">{{ t('cv_educationTitle') || 'Educación' }}</h2>
+          <div v-for="(edu, i) in cvData.education" :key="i" class="entry keep">
+            <div class="entry-row keep font-bold">
               <span class="entry-main">{{ edu.school }}</span>
               <span v-if="edu.location" class="entry-aside">{{ edu.location }}</span>
             </div>
-            <div class="entry-row italic">
+            <div class="entry-row keep italic">
               <span class="entry-main">{{ edu.degree }}</span>
               <span v-if="edu.date" class="entry-aside">{{ edu.date }}</span>
             </div>
@@ -137,15 +137,15 @@ const skillsEntries = computed(() => {
         </section>
 
         <section v-if="cvData.certifications?.length" class="section-block">
-          <h2 class="section-title">{{ t('cv_certificationsTitle') || 'Certificaciones' }}</h2>
+          <h2 class="section-title keep">{{ t('cv_certificationsTitle') || 'Certificaciones' }}</h2>
           <ul class="list-disc ml-5">
-            <li v-for="(cert, i) in cvData.certifications" :key="i">{{ cert }}</li>
+            <li v-for="(cert, i) in cvData.certifications" :key="i" class="keep">{{ cert }}</li>
           </ul>
         </section>
 
         <section v-if="skillsEntries.length" class="section-block">
-          <h2 class="section-title">{{ t('cv_skillsTitle') || 'Skills adicionales' }}</h2>
-          <p v-for="([key, val], idx) in skillsEntries" :key="idx" class="mb-1">
+          <h2 class="section-title keep">{{ t('cv_skillsTitle') || 'Skills adicionales' }}</h2>
+          <p v-for="([key, val], idx) in skillsEntries" :key="idx" class="keep skill-line">
             <strong>{{ formatSkillLabel(key) }}:</strong> {{ val }}
           </p>
         </section>
@@ -229,6 +229,16 @@ const skillsEntries = computed(() => {
 
 .section-block { margin-bottom: calc(var(--paragraph-spacing) + 10px); }
 
+.keep {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.skill-line {
+  margin: 0 0 3px;
+  overflow-wrap: break-word;
+}
+
 .entry { margin-bottom: 14px; }
 
 .entry-row {
@@ -245,9 +255,11 @@ const skillsEntries = computed(() => {
 }
 
 .entry-aside {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  max-width: 46%;
   margin-left: 16px;
-  white-space: nowrap;
+  text-align: right;
+  overflow-wrap: break-word;
 }
 
 .entry-title { margin-bottom: 4px; }

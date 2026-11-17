@@ -5,7 +5,7 @@ import { Copy, Trash2, FileText, Upload, Download } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { useCvStore } from '../store/cvStore'
 import ResumePreview from './ResumePreview.vue'
-import html2pdf from 'html2pdf.js'
+import { downloadJson, downloadResumePdf } from '../utils/downloadCv'
 
 const store = useCvStore()
 const { cvList } = storeToRefs(store)
@@ -56,48 +56,25 @@ const handleFileUpload = (event: Event) => {
 }
 
 const exportCvJson = (cv: any) => {
-  const dataStr = JSON.stringify(cv, null, 2)
-  const blob = new Blob([dataStr], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${(cv.fileName || 'CV_Export').replace(/\s+/g, '_')}.json`
-  a.click()
-  URL.revokeObjectURL(url)
+  downloadJson(cv.fileName || 'CV_Export', cv)
 }
 
 const exportCvPdf = async (cv: any, index: number) => {
+  if (printingIndex.value !== null) return
   const cvSettings = cv.meta?.settings ?? thumbnailSettings
-
-  // Mostrar el ResumePreview a tamaño real temporalmente para capturarlo
   printingIndex.value = index
-
-  await new Promise(r => setTimeout(r, 300))
+  await new Promise(r => requestAnimationFrame(() => r(null)))
 
   const pageEl = document.querySelector<HTMLElement>(`#print-source-${index} .resume-page`)
-
   if (!pageEl) {
     printingIndex.value = null
     alert(t('pdfMissing'))
     return
   }
 
-  // Desactivar scale/opacity para la captura de html2pdf
-  pageEl.style.opacity = '1'
-  pageEl.style.transform = 'none'
-  pageEl.style.boxShadow = 'none'
-
-  const opt = {
-    margin: 0,
-    filename: `${(cv.fileName || 'CV_Export').replace(/\s+/g, '_')}.pdf`,
-    image: { type: 'jpeg' as const, quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: cvSettings.paperSize === 'Letter' ? 'letter' : 'a4', orientation: 'portrait' as const }
-  }
-
   try {
-    await html2pdf().set(opt).from(pageEl).save()
-  } catch (error) {
+    await downloadResumePdf(pageEl, cv.fileName || 'CV_Export', cvSettings.paperSize)
+  } catch {
     alert(t('pdfError'))
   } finally {
     printingIndex.value = null
@@ -164,13 +141,12 @@ const confirmDelete = (index: number) => {
       <div
         v-for="(cv, index) in cvList"
         :key="index"
-        class="group relative bg-white dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-200/60 dark:border-gray-700/50 flex flex-col min-h-[420px]"
+        class="group relative bg-white dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-200/60 dark:border-gray-700/50 flex flex-col min-h-[420px]"
       >
         <!-- ResumePreview a tamaño real, oculto, para capturar al imprimir -->
         <div
           :id="`print-source-${index}`"
-          class="fixed left-[-9999px] top-0 pointer-events-none"
-          :style="printingIndex === index ? 'opacity:1' : 'opacity:0'"
+          class="fixed left-0 top-0 -z-10 pointer-events-none opacity-0"
         >
           <ResumePreview
             :cv-data="cv"
@@ -180,7 +156,7 @@ const confirmDelete = (index: number) => {
         </div>
 
         <div
-          class="relative flex-1 overflow-hidden bg-gray-100/50 dark:bg-gray-900/40 cursor-pointer"
+          class="relative flex-1 overflow-hidden rounded-t-2xl bg-gray-100/50 dark:bg-gray-900/40 cursor-pointer"
           @click="store.editCv(index)"
         >
           <div class="absolute top-4 left-1/2 -translate-x-1/2 origin-top transform scale-[0.35] shadow-xl rounded-sm overflow-hidden pointer-events-none select-none bg-white">
@@ -238,7 +214,7 @@ const confirmDelete = (index: number) => {
               </button>
               <div
                 v-if="downloadFor === index"
-                class="absolute bottom-8 right-0 z-20 w-36 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-lg overflow-hidden"
+                class="absolute bottom-full right-0 z-30 mb-2 w-36 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-lg overflow-hidden"
               >
                 <button
                   @click.stop="exportCvPdf(cv, index); downloadFor = null"

@@ -62,9 +62,13 @@ const dragSection = ref<string | null>(null)
 const dragFrom = ref<number | null>(null)
 const dragOver = ref<number | null>(null)
 
-const onDragStart = (section: string, index: number) => {
+const onDragStart = (section: string, index: number, e: DragEvent) => {
   dragSection.value = section
   dragFrom.value = index
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', `${section}:${index}`)
+  }
 }
 
 const onDragOver = (e: DragEvent, index: number) => {
@@ -184,7 +188,7 @@ const renameExtraSkillKey = (oldKey: string, newKeyRaw: string) => {
 }
 
 const addCertification = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLocal.value, certifications: [...cvDataLocal.value.certifications, ''] } }
-const addExperience = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLocal.value, experience: [...cvDataLocal.value.experience, { company: '', role: '', date: '', location: '', description: '' }] } }
+const addExperience = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLocal.value, experience: [...cvDataLocal.value.experience, { company: '', role: '', date: '', location: '', description: [] }] } }
 const addProject = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLocal.value, projects: [...cvDataLocal.value.projects, { name: '', description: '', tech: '' }] } }
 const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLocal.value, education: [...cvDataLocal.value.education, { school: '', degree: '', date: '', location: '' }] } }
 </script>
@@ -259,15 +263,12 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
               'opacity-40': dragSection === 'experience' && dragFrom === Number(index),
               'ring-2 ring-blue-400': dragSection === 'experience' && dragOver === Number(index) && dragFrom !== Number(index)
             }"
-            draggable="true"
-            @dragstart="onDragStart('experience', Number(index))"
             @dragover="onDragOver($event, Number(index))"
             @drop="onDrop('experience')"
-            @dragend="onDragEnd"
           >
             <div class="flex items-start gap-2 mb-2">
               <div class="flex flex-col items-center gap-0.5 pt-0.5">
-                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400" draggable="true" @dragstart.stop="onDragStart('experience', Number(index), $event)" @dragend="onDragEnd"><GripVertical :size="14" /></span>
                 <button @click="moveExperience(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
                 <button @click="moveExperience(Number(index), 1)" :disabled="Number(index) === cvDataLocal.experience.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
               </div>
@@ -306,15 +307,12 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
               'opacity-40': dragSection === 'projects' && dragFrom === Number(index),
               'ring-2 ring-blue-400': dragSection === 'projects' && dragOver === Number(index) && dragFrom !== Number(index)
             }"
-            draggable="true"
-            @dragstart="onDragStart('projects', Number(index))"
             @dragover="onDragOver($event, Number(index))"
             @drop="onDrop('projects')"
-            @dragend="onDragEnd"
           >
             <div class="flex items-start gap-2 mb-1">
               <div class="flex flex-col items-center gap-0.5 pt-0.5">
-                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400" draggable="true" @dragstart.stop="onDragStart('projects', Number(index), $event)" @dragend="onDragEnd"><GripVertical :size="14" /></span>
                 <button @click="moveProject(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
                 <button @click="moveProject(Number(index), 1)" :disabled="Number(index) === cvDataLocal.projects.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
               </div>
@@ -341,15 +339,12 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
               'opacity-40': dragSection === 'education' && dragFrom === Number(index),
               'ring-2 ring-blue-400': dragSection === 'education' && dragOver === Number(index) && dragFrom !== Number(index)
             }"
-            draggable="true"
-            @dragstart="onDragStart('education', Number(index))"
             @dragover="onDragOver($event, Number(index))"
             @drop="onDrop('education')"
-            @dragend="onDragEnd"
           >
             <div class="flex items-center gap-2 mb-2">
               <div class="flex flex-col items-center gap-0.5">
-                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+                <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400" draggable="true" @dragstart.stop="onDragStart('education', Number(index), $event)" @dragend="onDragEnd"><GripVertical :size="14" /></span>
                 <button @click="moveEducation(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
                 <button @click="moveEducation(Number(index), 1)" :disabled="Number(index) === cvDataLocal.education.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
               </div>
@@ -375,20 +370,17 @@ const addEducation = () => { ensureArrays(); cvDataLocal.value = { ...cvDataLoca
         <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 relative">
           <div
             v-for="(cert, index) in (cvDataLocal.certifications || [])"
-            :key="cert + index"
+            :key="index"
             class="flex gap-2 items-center transition-all bg-white dark:bg-gray-800"
             :class="{
               'opacity-40': dragSection === 'certifications' && dragFrom === Number(index),
               'ring-2 ring-blue-400 rounded': dragSection === 'certifications' && dragOver === Number(index) && dragFrom !== Number(index)
             }"
-            draggable="true"
-            @dragstart="onDragStart('certifications', Number(index))"
             @dragover="onDragOver($event, Number(index))"
             @drop="onDrop('certifications')"
-            @dragend="onDragEnd"
           >
             <div class="flex flex-col items-center gap-0.5">
-              <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400"><GripVertical :size="14" /></span>
+              <span class="grip-handle cursor-grab active:cursor-grabbing text-gray-300 dark:text-gray-600 hover:text-gray-400" draggable="true" @dragstart.stop="onDragStart('certifications', Number(index), $event)" @dragend="onDragEnd"><GripVertical :size="14" /></span>
               <button @click="moveCertification(Number(index), -1)" :disabled="Number(index) === 0" class="move-btn" type="button"><ChevronUp :size="13" /></button>
               <button @click="moveCertification(Number(index), 1)" :disabled="Number(index) === cvDataLocal.certifications.length - 1" class="move-btn" type="button"><ChevronDown :size="13" /></button>
             </div>

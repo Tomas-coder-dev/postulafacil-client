@@ -6,13 +6,12 @@ import { useCvStore } from '../store/cvStore'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import EditFile from '../components/EditFile.vue'
-import { defaultSettings } from '../utils/cvDefaults'
+import { defaultSettings, normalizeCv } from '../utils/cvDefaults'
+import { downloadJson, downloadResumePdf } from '../utils/downloadCv'
 
 import * as mammoth from 'mammoth'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-import html2pdf from 'html2pdf.js'
-
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
 
 const store = useCvStore()
@@ -32,8 +31,10 @@ const MAX_HISTORY = 50
 
 let syncingFromCv = false
 let applyingHistory = false
+let saveEcho = false
 let currentSnapshot = ''
 let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+const pdfBusy = ref(false)
 
 const snapshot = () => JSON.stringify({ cvData: cvData.value, settings: settings.value })
 
@@ -95,6 +96,18 @@ watch(
   currentCv,
   (val) => {
     if (!val) return
+    if (saveEcho) {
+      saveEcho = false
+      const normalized = JSON.parse(JSON.stringify(val))
+      if (JSON.stringify(cvData.value) !== JSON.stringify(normalized)) {
+        syncingFromCv = true
+        cvData.value = normalized
+        queueMicrotask(() => { syncingFromCv = false })
+      }
+      lastSavedSnapshot.value = snapshot()
+      hasUnsavedChanges.value = false
+      return
+    }
     cvData.value = JSON.parse(JSON.stringify(val))
     if (!cvData.value.meta) cvData.value.meta = {}
     if (!cvData.value.meta.settings) cvData.value.meta.settings = { ...defaultSettings }
@@ -142,7 +155,12 @@ watch(
 )
 
 const handleSave = () => {
-  if (autoSaveTimer) clearTimeout(autoSaveTimer)
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
+    autoSaveTimer = null
+  }
+  if (store.selectedCvIndex === null || !cvData.value || !Object.keys(cvData.value).length) return
+  saveEcho = true
   store.saveCV(JSON.parse(JSON.stringify(cvData.value)))
   lastSavedSnapshot.value = snapshot()
   hasUnsavedChanges.value = false
@@ -196,50 +214,26 @@ watch(mobileTab, async () => {
 })
 
 const handleExportJSON = () => {
-  const blob = new Blob([JSON.stringify(cvData.value, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${(cvData.value.fileName || 'CV').replace(/\s+/g, '_')}.json`
-  a.click()
-  URL.revokeObjectURL(url)
+  downloadJson(cvData.value.fileName || 'CV', cvData.value)
 }
 
 const handleExportPDF = async () => {
+  if (pdfBusy.value) return
   await nextTick()
 
-  const pageEl =
-    document.querySelector<HTMLElement>('#resume-preview-content.resume-page') ??
-    document.querySelector<HTMLElement>('#resume-preview-content .resume-page') ??
-    document.querySelector<HTMLElement>('.resume-page')
-
+  const pageEl = document.querySelector<HTMLElement>('#resume-preview-content')
   if (!pageEl) {
     alert(t('cvPageMissing'))
     return
   }
 
-  // Save styles to restore later
-  const originalTransform = pageEl.style.transform
-  const originalBoxShadow = pageEl.style.boxShadow
-  pageEl.style.transform = 'none'
-  pageEl.style.boxShadow = 'none'
-
-  const opt = {
-    margin: 0,
-    filename: `${(cvData.value.fileName || 'CV').replace(/\s+/g, '_')}.pdf`,
-    image: { type: 'jpeg' as const, quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: settings.value.paperSize === 'Letter' ? 'letter' : 'a4', orientation: 'portrait' as const }
-  }
-
+  pdfBusy.value = true
   try {
-    await html2pdf().set(opt).from(pageEl).save()
-  } catch (error) {
+    await downloadResumePdf(pageEl, cvData.value.fileName || 'CV', settings.value.paperSize)
+  } catch {
     alert(t('pdfError'))
   } finally {
-    // Restore styles
-    pageEl.style.transform = originalTransform
-    pageEl.style.boxShadow = originalBoxShadow
+    pdfBusy.value = false
   }
 }
 
@@ -251,7 +245,7 @@ const handleImportFile = async (file: File) => {
     const reader = new FileReader()
     reader.onload = () => {
       try {
-        const json = JSON.parse(reader.result as string)
+        const json = normalizeCv(JSON.parse(reader.result as string))
         cvData.value = json
         if (!cvData.value.fileName) cvData.value.fileName = file.name.replace(/\.json$/i, '')
         if (!cvData.value.meta) cvData.value.meta = {}
